@@ -1,0 +1,94 @@
+service: movie-booking-serverless-api
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.12
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  timeout: 10
+  environment:
+    DYNAMODB_TABLE: ticket-booking
+  
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/ticket-booking"
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+
+functions:
+  # GET Functions
+  retrieveMovies:
+    handler: handlers/get_handler.get_movies
+    events:
+      - http:
+          path: /movies
+          method: get
+          cors: true
+
+  retrieveTicket:
+    handler: handlers/get_handler.get_ticket
+    events:
+      - http:
+          path: /ticket
+          method: get
+          cors: true
+
+  retrieveAllTickets:
+    handler: handlers/get_handler.get_all_tickets
+    events:
+      - http:
+          path: /tickets
+          method: get
+          cors: true
+
+  # POST Function
+  createTicket:
+    handler: handlers/post_handler.create_ticket
+    events:
+      - http:
+          path: /ticket
+          method: post
+          cors: true
+
+  # PATCH Function
+  updateTicket:
+    handler: handlers/patch_handler.update_ticket
+    events:
+      - http:
+          path: /ticket
+          method: patch
+          cors: true
+
+  # DELETE Function
+  removeTicket:
+    handler: handlers/delete_handler.remove_ticket
+    events:
+      - http:
+          path: /ticket
+          method: delete
+          cors: true
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!.git/**'
+    - '!.serverless/**'
+    - '!.env'
+    - '!package.json'
+    - '!package-lock.json'
