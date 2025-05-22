@@ -1,0 +1,157 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Movie Ticket Booking CRUD API with Lambda and API Gateway using SAM
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: python3.12
+    Environment:
+      Variables:
+        TABLE_NAME: ticket-booking
+
+Resources:
+
+  ### API Gateway ###
+  TicketBookingApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: TicketBookingApi
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,POST,PATCH,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+  ### GET Functions ###
+  GetMoviesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: GetMoviesFunction
+      CodeUri:
+        Bucket: movieticketbookingcrud
+        Key: Movie_Ticket_Booking.zip 
+      Handler: GET_lambda_function.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: ticket-booking
+      Events:
+        GetMovies:
+          Type: Api
+          Properties:
+            Path: /movies
+            Method: get
+            RestApiId: !Ref TicketBookingApi
+        GetTicket:
+          Type: Api
+          Properties:
+            Path: /ticket
+            Method: get
+            RestApiId: !Ref TicketBookingApi
+        GetTickets:
+          Type: Api
+          Properties:
+            Path: /tickets
+            Method: get
+            RestApiId: !Ref TicketBookingApi
+
+  ### POST Function ###
+  PostTicketFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: PostTicketFunction
+      CodeUri:
+        Bucket: movieticketbookingcrud
+        Key: Movie_Ticket_Booking.zip
+      Handler: POST_lambda_function.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: ticket-booking
+      Events:
+        PostTicket:
+          Type: Api
+          Properties:
+            Path: /ticket
+            Method: post
+            RestApiId: !Ref TicketBookingApi
+
+  ### PATCH Function ###
+  PatchTicketFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: PatchTicketFunction
+      CodeUri:
+        Bucket: movieticketbookingcrud
+        Key: Movie_Ticket_Booking.zip
+      Handler: PATCH_lambda_function.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: ticket-booking
+      Events:
+        PatchTicket:
+          Type: Api
+          Properties:
+            Path: /ticket
+            Method: patch
+            RestApiId: !Ref TicketBookingApi
+
+  ### DELETE Function ###
+  DeleteTicketFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: DeleteTicketFunction
+      CodeUri:
+        Bucket: movieticketbookingcrud
+        Key: Movie_Ticket_Booking.zip
+      Handler: DELETE_lambda_function.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: ticket-booking
+      Events:
+        DeleteTicket:
+          Type: Api
+          Properties:
+            Path: /ticket
+            Method: delete
+            RestApiId: !Ref TicketBookingApi
+
+  ### DynamoDB Table (using existing table) ###
+  # TicketBookingTable:
+  #   Type: AWS::DynamoDB::Table
+  #   Properties:
+  #     TableName: ticket-booking
+  #     AttributeDefinitions:
+  #       - AttributeName: Theatre-Seat
+  #         AttributeType: S
+  #     KeySchema:
+  #       - AttributeName: Theatre-Seat
+  #         KeyType: HASH
+  #     BillingMode: PAY_PER_REQUEST
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL for Movie Ticket Booking"
+    Value: !Sub "https://${TicketBookingApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Export:
+      Name: !Sub "${AWS::StackName}-ApiUrl"
+  
+  DynamoDBTableName:
+    Description: "DynamoDB Table Name (existing table)"
+    Value: "ticket-booking"
+    Export:
+      Name: !Sub "${AWS::StackName}-TableName"
+    
+  ApiEndpoints:
+    Description: "Available API Endpoints"
+    Value: !Sub |
+      Base URL: https://${TicketBookingApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+      
+      Available Endpoints:
+      GET /movies - Get all unique movies
+      GET /ticket?Theatre-Seat=<seat-id> - Get specific ticket  
+      GET /tickets - Get all tickets
+      POST /ticket - Create new ticket
+      PATCH /ticket - Update existing ticket
+      DELETE /ticket - Delete ticket
+    Export:
+      Name: !Sub "${AWS::StackName}-ApiEndpoints"
