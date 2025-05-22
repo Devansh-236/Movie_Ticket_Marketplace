@@ -229,7 +229,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1747944794263-2025-05-22T20:13:14.263Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z/movie-booking-serverless-api.zip"
               },
               "Handler": "handlers/get_handler.get_movies",
               "Runtime": "python3.12",
@@ -259,7 +259,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1747944794263-2025-05-22T20:13:14.263Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z/movie-booking-serverless-api.zip"
               },
               "Handler": "handlers/get_handler.get_ticket",
               "Runtime": "python3.12",
@@ -289,7 +289,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1747944794263-2025-05-22T20:13:14.263Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z/movie-booking-serverless-api.zip"
               },
               "Handler": "handlers/get_handler.get_all_tickets",
               "Runtime": "python3.12",
@@ -319,7 +319,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1747944794263-2025-05-22T20:13:14.263Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z/movie-booking-serverless-api.zip"
               },
               "Handler": "handlers/post_handler.create_ticket",
               "Runtime": "python3.12",
@@ -349,7 +349,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1747944794263-2025-05-22T20:13:14.263Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z/movie-booking-serverless-api.zip"
               },
               "Handler": "handlers/patch_handler.update_ticket",
               "Runtime": "python3.12",
@@ -379,7 +379,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1747944794263-2025-05-22T20:13:14.263Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z/movie-booking-serverless-api.zip"
               },
               "Handler": "handlers/delete_handler.remove_ticket",
               "Runtime": "python3.12",
@@ -930,7 +930,7 @@
               "RemoveTicketLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1747944789004": {
+          "ApiGatewayDeployment1747946664734": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -1603,7 +1603,7 @@
         ],
         "artifactsS3KeyDirname": "serverless/movie-booking-serverless-api/dev/code-artifacts",
         "artifact": "/workspaces/MC_Intern/Movie_Ticket_Booking/Using_ServerlessFramework/.serverless/movie-booking-serverless-api.zip",
-        "artifactDirectoryName": "serverless/movie-booking-serverless-api/dev/1747944794263-2025-05-22T20:13:14.263Z"
+        "artifactDirectoryName": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z"
       }
     },
     "layers": {},
@@ -1611,7 +1611,7 @@
     "artifact": "/workspaces/MC_Intern/Movie_Ticket_Booking/Using_ServerlessFramework/.serverless/movie-booking-serverless-api.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/movie-booking-serverless-api/dev/1747944794263-2025-05-22T20:13:14.263Z",
+    "artifactDirectoryName": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z",
     "artifact": "movie-booking-serverless-api.zip"
   }
 }
