@@ -1,26 +1,45 @@
-# Movie Ticket Booking CRUD API - Serverless Framework
+# Movie Ticket Booking CRUD API - Serverless Framework with Event-Driven Architecture
 
-This project implements a movie ticket booking CRUD API using the Serverless Framework, AWS Lambda, API Gateway, and DynamoDB. It's designed to work alongside existing manual and CloudFormation-based implementations while using the same DynamoDB table.
+This project implements a movie ticket booking CRUD API using the Serverless Framework, AWS Lambda, API Gateway, and DynamoDB with event-driven price change handling. It's designed to work alongside existing manual and CloudFormation-based implementations while using the same DynamoDB table.
 
 ## Architecture
 
-- **AWS Lambda**: Serverless compute for handling API requests
+- **AWS Lambda**: Serverless compute for handling API requests and events
 - **API Gateway**: REST API endpoint management
 - **DynamoDB**: NoSQL database for storing ticket bookings (uses existing `ticket-booking` table)
+- **SNS**: Simple Notification Service for event publishing and handling
 - **Serverless Framework**: Infrastructure as Code deployment
+
+## Event-Driven Architecture
+
+The system implements an event-driven architecture specifically for price changes:
+
+1. **Price Update Trigger**: When a ticket price is updated via PATCH `/ticket`, an event is published
+2. **Event Processing**: A dedicated Lambda function processes the price change event
+3. **Metadata Update**: The event handler adds price change metadata to the same ticket
+4. **Completion Event**: After processing, a completion event is published
+
+### Event Flow
+
+```
+User Updates Price → PATCH Handler → Publishes "PriceChangeInitiated" Event
+                                  ↓
+Event Handler Processes → Updates Ticket Metadata → Publishes "PriceChangeProcessed" Event
+```
 
 ## Project Structure
 
 ```
 movie-booking-serverless-api/
-├── serverless.yml              # Serverless Framework configuration
+├── serverless.yml              # Serverless Framework configuration with SNS
 ├── package.json               # Node.js dependencies and scripts
 ├── requirements.txt           # Python dependencies
 ├── handlers/                  # Lambda function handlers
 │   ├── get_handler.py        # GET operations (retrieveMovies, retrieveTicket, retrieveAllTickets)
 │   ├── post_handler.py       # POST operations (createTicket)
-│   ├── patch_handler.py      # PATCH operations (updateTicket)
-│   └── delete_handler.py     # DELETE operations (removeTicket)
+│   ├── patch_handler.py      # PATCH operations (updateTicket) with event publishing
+│   ├── delete_handler.py     # DELETE operations (removeTicket)
+│   └── event_handler.py      # Event processing for price changes
 └── utils/                    # Utility modules
     ├── encoder.py           # Custom JSON encoder for DynamoDB
     └── response.py          # Standardized API response builder
@@ -34,8 +53,37 @@ movie-booking-serverless-api/
 | GET | `/ticket?Theatre-Seat=<id>` | `retrieveTicket` | Get specific ticket by ID |
 | GET | `/tickets` | `retrieveAllTickets` | Get all tickets |
 | POST | `/ticket` | `createTicket` | Create new ticket |
-| PATCH | `/ticket` | `updateTicket` | Update existing ticket |
+| PATCH | `/ticket` | `updateTicket` | Update existing ticket (triggers events for price changes) |
 | DELETE | `/ticket` | `removeTicket` | Delete ticket |
+
+## Event Processing
+
+### Price Change Events
+
+When updating a ticket's price using the PATCH endpoint, the system:
+
+1. **Publishes Initial Event**: `PriceChangeInitiated` event with:
+   - Theatre seat ID
+   - Movie name
+   - Old and new price values
+   - Timestamp
+
+2. **Processes Event**: Event handler adds metadata:
+   - `LastPriceChangeTimestamp`
+   - `PreviousPrice`
+   - `DiscountPercentage` (if price decreased)
+   - `IsDiscounted` (boolean flag)
+
+3. **Publishes Completion Event**: `PriceChangeProcessed` event indicating processing is complete
+
+### Event Handler Function
+
+The `priceChangeEventHandler` function:
+- Listens to SNS topic for price change events
+- Processes `PriceChangeInitiated` events
+- Updates the ticket with additional metadata
+- Publishes `PriceChangeProcessed` completion events
+- Avoids infinite loops by only processing initial events
 
 ## Prerequisites
 
@@ -81,69 +129,71 @@ npm run deploy-prod
 serverless deploy --stage dev
 ```
 
-### 4. Test the API
+### 4. Test the Event-Driven Price Changes
 
-After deployment, you'll receive an API Gateway URL. Test the endpoints:
+After deployment, test the price change functionality:
 
 ```bash
-# Get all movies
-curl https://your-api-id.execute-api.region.amazonaws.com/dev/movies
-
-# Create a ticket
+# Create a ticket first
 curl -X POST https://your-api-id.execute-api.region.amazonaws.com/dev/ticket \
   -H "Content-Type: application/json" \
   -d '{"Theatre-Seat": "1-A9", "Movie": "Avengers", "Price": 15.99}'
 
-# Get specific ticket
-curl "https://your-api-id.execute-api.region.amazonaws.com/dev/ticket?Theatre-Seat=1-A9"
-
-# Update ticket
+# Update the price (this will trigger events)
 curl -X PATCH https://your-api-id.execute-api.region.amazonaws.com/dev/ticket \
   -H "Content-Type: application/json" \
-  -d '{"Theatre-Seat": "1-A9", "updateKey": "Price", "updateValue": 18.99}'
+  -d '{"Theatre-Seat": "1-A9", "updateKey": "Price", "updateValue": 12.99}'
 
-# Delete ticket
-curl -X DELETE https://your-api-id.execute-api.region.amazonaws.com/dev/ticket \
-  -H "Content-Type: application/json" \
-  -d '{"Theatre-Seat": "1-A9"}'
+# Check the updated ticket to see added metadata
+curl "https://your-api-id.execute-api.region.amazonaws.com/dev/ticket?Theatre-Seat=1-A9"
 ```
 
 ## Environment Configuration
 
-The application supports multiple stages (dev, prod, etc.):
+The application supports multiple stages with SNS topic isolation:
 
 ```bash
-# Deploy to different stages
+# Deploy to different stages (each gets its own SNS topic)
 serverless deploy --stage dev
 serverless deploy --stage prod --region us-west-2
 ```
 
 ## Function Names
 
-This implementation uses different function names from the original CloudFormation setup:
+This implementation includes all original functions plus:
 
-- `retrieveMovies` (instead of `GetMoviesFunction`)
-- `retrieveTicket` (instead of `GetTicket`)
-- `retrieveAllTickets` (instead of `GetTickets`)
-- `createTicket` (instead of `PostTicketFunction`)
-- `updateTicket` (instead of `PatchTicketFunction`)
-- `removeTicket` (instead of `DeleteTicketFunction`)
+- `priceChangeEventHandler` - Processes price change events from SNS
 
 ## Database Schema
 
-The application uses the existing `ticket-booking` DynamoDB table with:
+The application uses the existing `ticket-booking` DynamoDB table with additional fields added by the event handler:
 
 - **Primary Key**: `Theatre-Seat` (String)
-- **Attributes**: `Movie`, `Price`, and any other ticket-related fields
+- **Original Attributes**: `Movie`, `Price`, and other ticket-related fields
+- **Event-Added Attributes**:
+  - `LastPriceChangeTimestamp` - ISO timestamp of last price change
+  - `PreviousPrice` - Previous price value before the change
+  - `DiscountPercentage` - Calculated discount percentage (if applicable)
+  - `IsDiscounted` - Boolean indicating if ticket is currently discounted
 
 ## Development Commands
 
 ```bash
-# View logs for a specific function
-serverless logs -f createTicket --tail
+# View logs for the event handler
+serverless logs -f priceChangeEventHandler --tail
 
-# Invoke function locally
-serverless invoke local -f createTicket -d '{"body": "{\"Theatre-Seat\":\"1-A9\",\"Movie\":\"Test Movie\"}"}'
+# View logs for patch handler
+serverless logs -f updateTicket --tail
+
+# Invoke event handler locally with test event
+serverless invoke local -f priceChangeEventHandler -d '{
+  "Records": [{
+    "EventSource": "aws:sns",
+    "Sns": {
+      "Message": "{\"eventType\":\"PriceChangeInitiated\",\"theatreSeat\":\"1-A9\",\"movie\":\"Test Movie\",\"oldPrice\":15.99,\"newPrice\":12.99}"
+    }
+  }]
+}'
 
 # Remove the entire stack
 serverless remove
@@ -151,41 +201,47 @@ serverless remove
 
 ## Error Handling
 
-The application includes comprehensive error handling:
+Enhanced error handling includes:
+- Event publishing failure handling (operations continue even if events fail)
+- SNS message parsing validation
+- Event loop prevention (only processes initial price change events)
+- Comprehensive logging for event processing
 
-- Input validation for required fields
-- JSON parsing error handling
-- DynamoDB operation error handling
-- Standardized error responses with appropriate HTTP status codes
+## Event Monitoring
 
-## CORS Configuration
-
-CORS is enabled for all endpoints to allow cross-origin requests from web applications.
+Monitor events through:
+- **CloudWatch Logs**: View Lambda function logs for event processing
+- **SNS Metrics**: Monitor message publishing and delivery
+- **DynamoDB Metrics**: Track read/write operations
 
 ## Security Considerations
 
-1. **IAM Roles**: Functions have minimal required permissions for DynamoDB operations
-2. **Input Validation**: All inputs are validated before processing
-3. **Error Messages**: Generic error messages to avoid information disclosure
-
-## Monitoring and Logging
-
-- CloudWatch logs are automatically created for each function
-- Structured logging with appropriate log levels
-- Request/response logging for debugging
+Additional security measures:
+- **SNS Permissions**: Functions have minimal required permissions for SNS operations
+- **Event Validation**: All event messages are validated before processing
+- **Event Loop Prevention**: Built-in safeguards against infinite event loops
 
 ## Cost Optimization
 
-- Pay-per-request billing for DynamoDB
-- Lambda functions with appropriate timeout settings
-- Efficient DynamoDB queries to minimize read/write units
+Event-driven architecture considerations:
+- SNS pay-per-message pricing
+- Lambda invocations for event processing
+- Optimized event payloads to minimize costs
 
 ## Cleanup
 
-To remove all resources:
+To remove all resources including SNS topics:
 
 ```bash
 serverless remove --stage dev
 ```
 
-This will delete all Lambda functions, API Gateway, and associated IAM roles, but will preserve the existing DynamoDB table.
+This will delete all Lambda functions, API Gateway, SNS topics, and associated IAM roles, but will preserve the existing DynamoDB table.
+
+## Event Flow Example
+
+1. **User updates price**: PATCH `/ticket` with price change
+2. **System publishes event**: `PriceChangeInitiated` event to SNS
+3. **Event handler processes**: Adds metadata to the same ticket
+4. **System publishes completion**: `PriceChangeProcessed` event
+5. **Logging**: All events are logged for monitoring and debugging

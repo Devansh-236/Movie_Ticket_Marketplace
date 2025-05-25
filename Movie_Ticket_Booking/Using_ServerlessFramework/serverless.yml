@@ -10,6 +10,7 @@ provider:
   timeout: 10
   environment:
     DYNAMODB_TABLE: ticket-booking
+    PRICE_CHANGE_TOPIC_ARN: !Ref PriceChangeTopic
   
   iam:
     role:
@@ -23,6 +24,10 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/ticket-booking"
+        - Effect: Allow
+          Action:
+            - sns:Publish
+          Resource: !Ref PriceChangeTopic
 
 plugins:
   - serverless-python-requirements
@@ -83,6 +88,22 @@ functions:
           path: /ticket
           method: delete
           cors: true
+
+  # Event Handler Function
+  priceChangeEventHandler:
+    handler: handlers/event_handler.handle_price_change_event
+    events:
+      - sns:
+          arn: !Ref PriceChangeTopic
+          topicName: PriceChangeTopic
+
+resources:
+  Resources:
+    PriceChangeTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:service}-${self:provider.stage}-price-change-topic
+        DisplayName: Movie Ticket Price Change Topic
 
 package:
   patterns:

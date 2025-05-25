@@ -11,7 +11,10 @@
       "region": "us-east-1",
       "timeout": 10,
       "environment": {
-        "DYNAMODB_TABLE": "ticket-booking"
+        "DYNAMODB_TABLE": "ticket-booking",
+        "PRICE_CHANGE_TOPIC_ARN": {
+          "Ref": "PriceChangeTopic"
+        }
       },
       "iam": {
         "role": {
@@ -27,6 +30,15 @@
                 "dynamodb:DeleteItem"
               ],
               "Resource": "arn:aws:dynamodb:us-east-1:*:table/ticket-booking"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "sns:Publish"
+              ],
+              "Resource": {
+                "Ref": "PriceChangeTopic"
+              }
             }
           ]
         }
@@ -141,6 +153,12 @@
               "LogGroupName": "/aws/lambda/movie-booking-serverless-api-dev-removeTicket"
             }
           },
+          "PriceChangeEventHandlerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/movie-booking-serverless-api-dev-priceChangeEventHandler"
+            }
+          },
           "IamRoleLambdaExecution": {
             "Type": "AWS::IAM::Role",
             "Properties": {
@@ -201,6 +219,9 @@
                       },
                       {
                         "$ref": "$[\"service\"][\"provider\"][\"iam\"][\"role\"][\"statements\"][0]"
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iam\"][\"role\"][\"statements\"][1]"
                       }
                     ]
                   }
@@ -229,7 +250,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1748195087883-2025-05-25T17:44:47.883Z/movie-booking-serverless-api.zip"
               },
               "Handler": "handlers/get_handler.get_movies",
               "Runtime": "python3.12",
@@ -238,7 +259,10 @@
               "Timeout": 10,
               "Environment": {
                 "Variables": {
-                  "DYNAMODB_TABLE": "ticket-booking"
+                  "DYNAMODB_TABLE": "ticket-booking",
+                  "PRICE_CHANGE_TOPIC_ARN": {
+                    "$ref": "$[\"service\"][\"provider\"][\"environment\"][\"PRICE_CHANGE_TOPIC_ARN\"]"
+                  }
                 }
               },
               "Role": {
@@ -259,7 +283,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1748195087883-2025-05-25T17:44:47.883Z/movie-booking-serverless-api.zip"
               },
               "Handler": "handlers/get_handler.get_ticket",
               "Runtime": "python3.12",
@@ -268,7 +292,10 @@
               "Timeout": 10,
               "Environment": {
                 "Variables": {
-                  "DYNAMODB_TABLE": "ticket-booking"
+                  "DYNAMODB_TABLE": "ticket-booking",
+                  "PRICE_CHANGE_TOPIC_ARN": {
+                    "$ref": "$[\"service\"][\"provider\"][\"environment\"][\"PRICE_CHANGE_TOPIC_ARN\"]"
+                  }
                 }
               },
               "Role": {
@@ -289,7 +316,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1748195087883-2025-05-25T17:44:47.883Z/movie-booking-serverless-api.zip"
               },
               "Handler": "handlers/get_handler.get_all_tickets",
               "Runtime": "python3.12",
@@ -298,7 +325,10 @@
               "Timeout": 10,
               "Environment": {
                 "Variables": {
-                  "DYNAMODB_TABLE": "ticket-booking"
+                  "DYNAMODB_TABLE": "ticket-booking",
+                  "PRICE_CHANGE_TOPIC_ARN": {
+                    "$ref": "$[\"service\"][\"provider\"][\"environment\"][\"PRICE_CHANGE_TOPIC_ARN\"]"
+                  }
                 }
               },
               "Role": {
@@ -319,7 +349,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1748195087883-2025-05-25T17:44:47.883Z/movie-booking-serverless-api.zip"
               },
               "Handler": "handlers/post_handler.create_ticket",
               "Runtime": "python3.12",
@@ -328,7 +358,10 @@
               "Timeout": 10,
               "Environment": {
                 "Variables": {
-                  "DYNAMODB_TABLE": "ticket-booking"
+                  "DYNAMODB_TABLE": "ticket-booking",
+                  "PRICE_CHANGE_TOPIC_ARN": {
+                    "$ref": "$[\"service\"][\"provider\"][\"environment\"][\"PRICE_CHANGE_TOPIC_ARN\"]"
+                  }
                 }
               },
               "Role": {
@@ -349,7 +382,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1748195087883-2025-05-25T17:44:47.883Z/movie-booking-serverless-api.zip"
               },
               "Handler": "handlers/patch_handler.update_ticket",
               "Runtime": "python3.12",
@@ -358,7 +391,10 @@
               "Timeout": 10,
               "Environment": {
                 "Variables": {
-                  "DYNAMODB_TABLE": "ticket-booking"
+                  "DYNAMODB_TABLE": "ticket-booking",
+                  "PRICE_CHANGE_TOPIC_ARN": {
+                    "$ref": "$[\"service\"][\"provider\"][\"environment\"][\"PRICE_CHANGE_TOPIC_ARN\"]"
+                  }
                 }
               },
               "Role": {
@@ -379,7 +415,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1748195087883-2025-05-25T17:44:47.883Z/movie-booking-serverless-api.zip"
               },
               "Handler": "handlers/delete_handler.remove_ticket",
               "Runtime": "python3.12",
@@ -388,7 +424,10 @@
               "Timeout": 10,
               "Environment": {
                 "Variables": {
-                  "DYNAMODB_TABLE": "ticket-booking"
+                  "DYNAMODB_TABLE": "ticket-booking",
+                  "PRICE_CHANGE_TOPIC_ARN": {
+                    "$ref": "$[\"service\"][\"provider\"][\"environment\"][\"PRICE_CHANGE_TOPIC_ARN\"]"
+                  }
                 }
               },
               "Role": {
@@ -402,64 +441,107 @@
               "RemoveTicketLogGroup"
             ]
           },
-          "RetrieveMoviesLambdaVersionVNPKtqsneL0Kv8heyRxexmaZq45QBRPrcgHLbZqqfTg": {
+          "PriceChangeEventHandlerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1748195087883-2025-05-25T17:44:47.883Z/movie-booking-serverless-api.zip"
+              },
+              "Handler": "handlers/event_handler.handle_price_change_event",
+              "Runtime": "python3.12",
+              "FunctionName": "movie-booking-serverless-api-dev-priceChangeEventHandler",
+              "MemorySize": 1024,
+              "Timeout": 10,
+              "Environment": {
+                "Variables": {
+                  "DYNAMODB_TABLE": "ticket-booking",
+                  "PRICE_CHANGE_TOPIC_ARN": {
+                    "$ref": "$[\"service\"][\"provider\"][\"environment\"][\"PRICE_CHANGE_TOPIC_ARN\"]"
+                  }
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "PriceChangeEventHandlerLogGroup"
+            ]
+          },
+          "RetrieveMoviesLambdaVersionAyjJO5Vl6Wis62Ocojbe0REZipKWtiTgrnDyOqz6mU": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "RetrieveMoviesLambdaFunction"
               },
-              "CodeSha256": "zWs6ZYcQwv6ov499kc03HGJc7rOS/zQIb7O3Z2t1hX4="
+              "CodeSha256": "3bIncn6h3fvfCisCp7M5yOPQbiLpRgWapcIyckwfciM="
             }
           },
-          "RetrieveTicketLambdaVersiono33zQaZEQNi1wWETXgdnpS8EUKUQmnTbQ3v3rJQ9E8": {
+          "RetrieveTicketLambdaVersionJXHxG1j8hn9ZMq0TdV3wShFXSMaOH75GnuXqfIDTP0": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "RetrieveTicketLambdaFunction"
               },
-              "CodeSha256": "zWs6ZYcQwv6ov499kc03HGJc7rOS/zQIb7O3Z2t1hX4="
+              "CodeSha256": "3bIncn6h3fvfCisCp7M5yOPQbiLpRgWapcIyckwfciM="
             }
           },
-          "RetrieveAllTicketsLambdaVersionoFEmVpg1VrMugdteYzS8wKd3I1PCn7J6NXmt69s8fM": {
+          "RetrieveAllTicketsLambdaVersion1la4zX6Sp7QPDaVRMGbCsu02Ly8JYZzrnxcLdMDt4": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "RetrieveAllTicketsLambdaFunction"
               },
-              "CodeSha256": "zWs6ZYcQwv6ov499kc03HGJc7rOS/zQIb7O3Z2t1hX4="
+              "CodeSha256": "3bIncn6h3fvfCisCp7M5yOPQbiLpRgWapcIyckwfciM="
             }
           },
-          "CreateTicketLambdaVersionrJZyzbulNyqcF38DGyM12Xqny4yODBiAo14mEEiIvZU": {
+          "CreateTicketLambdaVersionMVSZ8IY9qOPjZKctLbFgLjhWKdLBy6XEcyulWeKQ9I": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "CreateTicketLambdaFunction"
               },
-              "CodeSha256": "zWs6ZYcQwv6ov499kc03HGJc7rOS/zQIb7O3Z2t1hX4="
+              "CodeSha256": "3bIncn6h3fvfCisCp7M5yOPQbiLpRgWapcIyckwfciM="
             }
           },
-          "UpdateTicketLambdaVersionN5Y6vLknbC5Kj1ca4B5H1ePlZU2o9CNI7s2rTH9I": {
+          "UpdateTicketLambdaVersionwa0tHARaHjJP55S11eTXiIWY77mMYUT9uGL7gPV8": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "UpdateTicketLambdaFunction"
               },
-              "CodeSha256": "zWs6ZYcQwv6ov499kc03HGJc7rOS/zQIb7O3Z2t1hX4="
+              "CodeSha256": "3bIncn6h3fvfCisCp7M5yOPQbiLpRgWapcIyckwfciM="
             }
           },
-          "RemoveTicketLambdaVersionDrSKiP5PxN7zZXzao10HJBYgnHjYQdBGX89rvBlNz2c": {
+          "RemoveTicketLambdaVersionF8seZQstdenxEh5fHInLuzG6ErEqvzVyxCzVbw8R4": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "RemoveTicketLambdaFunction"
               },
-              "CodeSha256": "zWs6ZYcQwv6ov499kc03HGJc7rOS/zQIb7O3Z2t1hX4="
+              "CodeSha256": "3bIncn6h3fvfCisCp7M5yOPQbiLpRgWapcIyckwfciM="
+            }
+          },
+          "PriceChangeEventHandlerLambdaVersion5Sv0a0VPcs9Gu4lRVF4zV0OsyOmxiZFNabQkh6r4k": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "PriceChangeEventHandlerLambdaFunction"
+              },
+              "CodeSha256": "3bIncn6h3fvfCisCp7M5yOPQbiLpRgWapcIyckwfciM="
             }
           },
           "ApiGatewayRestApi": {
@@ -930,7 +1012,7 @@
               "RemoveTicketLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1747946664734": {
+          "ApiGatewayDeployment1748195084261": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -1171,6 +1253,44 @@
                 ]
               }
             }
+          },
+          "PriceChangeEventHandlerSnsSubscriptionPriceChangeTopic": {
+            "Type": "AWS::SNS::Subscription",
+            "Properties": {
+              "TopicArn": {
+                "Ref": "PriceChangeTopic"
+              },
+              "Protocol": "lambda",
+              "Endpoint": {
+                "Fn::GetAtt": [
+                  "PriceChangeEventHandlerLambdaFunction",
+                  "Arn"
+                ]
+              }
+            }
+          },
+          "PriceChangeEventHandlerLambdaPermissionPriceChangeTopicSNS": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "PriceChangeEventHandlerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "sns.amazonaws.com",
+              "SourceArn": {
+                "Ref": "PriceChangeTopic"
+              }
+            }
+          },
+          "PriceChangeTopic": {
+            "Type": "AWS::SNS::Topic",
+            "Properties": {
+              "TopicName": "movie-booking-serverless-api-dev-price-change-topic",
+              "DisplayName": "Movie Ticket Price Change Topic"
+            }
           }
         },
         "Outputs": {
@@ -1185,7 +1305,7 @@
           "RetrieveMoviesLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "RetrieveMoviesLambdaVersionVNPKtqsneL0Kv8heyRxexmaZq45QBRPrcgHLbZqqfTg"
+              "Ref": "RetrieveMoviesLambdaVersionAyjJO5Vl6Wis62Ocojbe0REZipKWtiTgrnDyOqz6mU"
             },
             "Export": {
               "Name": "sls-movie-booking-serverless-api-dev-RetrieveMoviesLambdaFunctionQualifiedArn"
@@ -1194,7 +1314,7 @@
           "RetrieveTicketLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "RetrieveTicketLambdaVersiono33zQaZEQNi1wWETXgdnpS8EUKUQmnTbQ3v3rJQ9E8"
+              "Ref": "RetrieveTicketLambdaVersionJXHxG1j8hn9ZMq0TdV3wShFXSMaOH75GnuXqfIDTP0"
             },
             "Export": {
               "Name": "sls-movie-booking-serverless-api-dev-RetrieveTicketLambdaFunctionQualifiedArn"
@@ -1203,7 +1323,7 @@
           "RetrieveAllTicketsLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "RetrieveAllTicketsLambdaVersionoFEmVpg1VrMugdteYzS8wKd3I1PCn7J6NXmt69s8fM"
+              "Ref": "RetrieveAllTicketsLambdaVersion1la4zX6Sp7QPDaVRMGbCsu02Ly8JYZzrnxcLdMDt4"
             },
             "Export": {
               "Name": "sls-movie-booking-serverless-api-dev-RetrieveAllTicketsLambdaFunctionQualifiedArn"
@@ -1212,7 +1332,7 @@
           "CreateTicketLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "CreateTicketLambdaVersionrJZyzbulNyqcF38DGyM12Xqny4yODBiAo14mEEiIvZU"
+              "Ref": "CreateTicketLambdaVersionMVSZ8IY9qOPjZKctLbFgLjhWKdLBy6XEcyulWeKQ9I"
             },
             "Export": {
               "Name": "sls-movie-booking-serverless-api-dev-CreateTicketLambdaFunctionQualifiedArn"
@@ -1221,7 +1341,7 @@
           "UpdateTicketLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "UpdateTicketLambdaVersionN5Y6vLknbC5Kj1ca4B5H1ePlZU2o9CNI7s2rTH9I"
+              "Ref": "UpdateTicketLambdaVersionwa0tHARaHjJP55S11eTXiIWY77mMYUT9uGL7gPV8"
             },
             "Export": {
               "Name": "sls-movie-booking-serverless-api-dev-UpdateTicketLambdaFunctionQualifiedArn"
@@ -1230,10 +1350,19 @@
           "RemoveTicketLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "RemoveTicketLambdaVersionDrSKiP5PxN7zZXzao10HJBYgnHjYQdBGX89rvBlNz2c"
+              "Ref": "RemoveTicketLambdaVersionF8seZQstdenxEh5fHInLuzG6ErEqvzVyxCzVbw8R4"
             },
             "Export": {
               "Name": "sls-movie-booking-serverless-api-dev-RemoveTicketLambdaFunctionQualifiedArn"
+            }
+          },
+          "PriceChangeEventHandlerLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "PriceChangeEventHandlerLambdaVersion5Sv0a0VPcs9Gu4lRVF4zV0OsyOmxiZFNabQkh6r4k"
+            },
+            "Export": {
+              "Name": "sls-movie-booking-serverless-api-dev-PriceChangeEventHandlerLambdaFunctionQualifiedArn"
             }
           },
           "ServiceEndpoint": {
@@ -1392,7 +1521,7 @@
         "timeout": 10,
         "runtime": "python3.12",
         "vpc": {},
-        "versionLogicalId": "RetrieveMoviesLambdaVersionVNPKtqsneL0Kv8heyRxexmaZq45QBRPrcgHLbZqqfTg"
+        "versionLogicalId": "RetrieveMoviesLambdaVersionAyjJO5Vl6Wis62Ocojbe0REZipKWtiTgrnDyOqz6mU"
       },
       "retrieveTicket": {
         "handler": "handlers/get_handler.get_ticket",
@@ -1428,7 +1557,7 @@
         "timeout": 10,
         "runtime": "python3.12",
         "vpc": {},
-        "versionLogicalId": "RetrieveTicketLambdaVersiono33zQaZEQNi1wWETXgdnpS8EUKUQmnTbQ3v3rJQ9E8"
+        "versionLogicalId": "RetrieveTicketLambdaVersionJXHxG1j8hn9ZMq0TdV3wShFXSMaOH75GnuXqfIDTP0"
       },
       "retrieveAllTickets": {
         "handler": "handlers/get_handler.get_all_tickets",
@@ -1464,7 +1593,7 @@
         "timeout": 10,
         "runtime": "python3.12",
         "vpc": {},
-        "versionLogicalId": "RetrieveAllTicketsLambdaVersionoFEmVpg1VrMugdteYzS8wKd3I1PCn7J6NXmt69s8fM"
+        "versionLogicalId": "RetrieveAllTicketsLambdaVersion1la4zX6Sp7QPDaVRMGbCsu02Ly8JYZzrnxcLdMDt4"
       },
       "createTicket": {
         "handler": "handlers/post_handler.create_ticket",
@@ -1500,7 +1629,7 @@
         "timeout": 10,
         "runtime": "python3.12",
         "vpc": {},
-        "versionLogicalId": "CreateTicketLambdaVersionrJZyzbulNyqcF38DGyM12Xqny4yODBiAo14mEEiIvZU"
+        "versionLogicalId": "CreateTicketLambdaVersionMVSZ8IY9qOPjZKctLbFgLjhWKdLBy6XEcyulWeKQ9I"
       },
       "updateTicket": {
         "handler": "handlers/patch_handler.update_ticket",
@@ -1536,7 +1665,7 @@
         "timeout": 10,
         "runtime": "python3.12",
         "vpc": {},
-        "versionLogicalId": "UpdateTicketLambdaVersionN5Y6vLknbC5Kj1ca4B5H1ePlZU2o9CNI7s2rTH9I"
+        "versionLogicalId": "UpdateTicketLambdaVersionwa0tHARaHjJP55S11eTXiIWY77mMYUT9uGL7gPV8"
       },
       "removeTicket": {
         "handler": "handlers/delete_handler.remove_ticket",
@@ -1572,8 +1701,40 @@
         "timeout": 10,
         "runtime": "python3.12",
         "vpc": {},
-        "versionLogicalId": "RemoveTicketLambdaVersionDrSKiP5PxN7zZXzao10HJBYgnHjYQdBGX89rvBlNz2c"
+        "versionLogicalId": "RemoveTicketLambdaVersionF8seZQstdenxEh5fHInLuzG6ErEqvzVyxCzVbw8R4"
+      },
+      "priceChangeEventHandler": {
+        "handler": "handlers/event_handler.handle_price_change_event",
+        "events": [
+          {
+            "sns": {
+              "arn": {
+                "Ref": "PriceChangeTopic"
+              },
+              "topicName": "PriceChangeTopic"
+            }
+          }
+        ],
+        "name": "movie-booking-serverless-api-dev-priceChangeEventHandler",
+        "package": {},
+        "memory": 1024,
+        "timeout": 10,
+        "runtime": "python3.12",
+        "vpc": {},
+        "versionLogicalId": "PriceChangeEventHandlerLambdaVersion5Sv0a0VPcs9Gu4lRVF4zV0OsyOmxiZFNabQkh6r4k"
       }
+    },
+    "resources": {
+      "Resources": {
+        "PriceChangeTopic": {
+          "Type": "AWS::SNS::Topic",
+          "Properties": {
+            "TopicName": "movie-booking-serverless-api-dev-price-change-topic",
+            "DisplayName": "Movie Ticket Price Change Topic"
+          }
+        }
+      },
+      "Outputs": {}
     },
     "configValidationMode": "warn",
     "serviceFilename": "serverless.yml",
@@ -1592,6 +1753,9 @@
       "functions": {
         "$ref": "$[\"service\"][\"functions\"]"
       },
+      "resources": {
+        "$ref": "$[\"service\"][\"resources\"]"
+      },
       "package": {
         "patterns": [
           "!node_modules/**",
@@ -1603,7 +1767,7 @@
         ],
         "artifactsS3KeyDirname": "serverless/movie-booking-serverless-api/dev/code-artifacts",
         "artifact": "/workspaces/MC_Intern/Movie_Ticket_Booking/Using_ServerlessFramework/.serverless/movie-booking-serverless-api.zip",
-        "artifactDirectoryName": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z"
+        "artifactDirectoryName": "serverless/movie-booking-serverless-api/dev/1748195087883-2025-05-25T17:44:47.883Z"
       }
     },
     "layers": {},
@@ -1611,7 +1775,7 @@
     "artifact": "/workspaces/MC_Intern/Movie_Ticket_Booking/Using_ServerlessFramework/.serverless/movie-booking-serverless-api.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/movie-booking-serverless-api/dev/1747946667986-2025-05-22T20:44:27.986Z",
+    "artifactDirectoryName": "serverless/movie-booking-serverless-api/dev/1748195087883-2025-05-25T17:44:47.883Z",
     "artifact": "movie-booking-serverless-api.zip"
   }
 }
