@@ -1,17 +1,16 @@
 service: movie-booking-serverless-api
 
-frameworkVersion: '3'
+frameworkVersion: '^3.0.0'
 
 provider:
   name: aws
   runtime: python3.11
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
-  timeout: 10
+  timeout: 30
   environment:
     DYNAMODB_TABLE: ticket-booking
     PRICE_CHANGE_TOPIC_ARN: !Ref PriceChangeTopic
-  
   iam:
     role:
       statements:
@@ -43,61 +42,20 @@ custom:
     dockerizePip: non-linux
 
 functions:
-  # GET Functions
-  retrieveMovies:
-    handler: handlers/get_handler.get_movies
+  # Main FastAPI application
+  api:
+    handler: app.handler
     events:
-      - http:
-          path: /movies
-          method: get
-          cors: true
-
-  retrieveTicket:
-    handler: handlers/get_handler.get_ticket
-    events:
-      - http:
-          path: /ticket
-          method: get
-          cors: true
-
-  retrieveAllTickets:
-    handler: handlers/get_handler.get_all_tickets
-    events:
-      - http:
-          path: /tickets
-          method: get
-          cors: true
-
-  # POST Function
-  createTicket:
-    handler: handlers/post_handler.create_ticket
-    events:
-      - http:
-          path: /ticket
-          method: post
-          cors: true
-
-  # PATCH Function
-  updateTicket:
-    handler: handlers/patch_handler.update_ticket
-    events:
-      - http:
-          path: /ticket
-          method: patch
-          cors: true
-
-  # DELETE Function
-  removeTicket:
-    handler: handlers/delete_handler.remove_ticket
-    events:
-      - http:
-          path: /ticket
-          method: delete
-          cors: true
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+      - httpApi:
+          path: /
+          method: ANY
 
   # Event Handler Function - triggered by SQS
   priceChangeEventHandler:
-    handler: handlers/event_handler.handle_price_change_event
+    handler: handlers.event_handler.handle_price_change_event
     events:
       - sqs:
           arn: !GetAtt PriceChangeQueue.Arn
@@ -116,8 +74,8 @@ resources:
       Properties:
         QueueName: ${self:service}-${self:provider.stage}-price-change-queue
         VisibilityTimeout: 300
-        MessageRetentionPeriod: 1209600  # 14 days
-        ReceiveMessageWaitTimeSeconds: 20  # Long polling
+        MessageRetentionPeriod: 1209600 # 14 days
+        ReceiveMessageWaitTimeSeconds: 20 # Long polling
 
     PriceChangeQueuePolicy:
       Type: AWS::SQS::QueuePolicy

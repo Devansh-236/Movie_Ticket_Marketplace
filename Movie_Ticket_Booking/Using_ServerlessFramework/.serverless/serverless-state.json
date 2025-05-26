@@ -6,10 +6,10 @@
     },
     "provider": {
       "name": "aws",
-      "runtime": "python3.12",
+      "runtime": "python3.11",
       "stage": "dev",
       "region": "us-east-1",
-      "timeout": 10,
+      "timeout": 30,
       "environment": {
         "DYNAMODB_TABLE": "ticket-booking",
         "PRICE_CHANGE_TOPIC_ARN": {
@@ -131,40 +131,10 @@
               }
             }
           },
-          "RetrieveMoviesLogGroup": {
+          "ApiLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
-              "LogGroupName": "/aws/lambda/movie-booking-serverless-api-dev-retrieveMovies"
-            }
-          },
-          "RetrieveTicketLogGroup": {
-            "Type": "AWS::Logs::LogGroup",
-            "Properties": {
-              "LogGroupName": "/aws/lambda/movie-booking-serverless-api-dev-retrieveTicket"
-            }
-          },
-          "RetrieveAllTicketsLogGroup": {
-            "Type": "AWS::Logs::LogGroup",
-            "Properties": {
-              "LogGroupName": "/aws/lambda/movie-booking-serverless-api-dev-retrieveAllTickets"
-            }
-          },
-          "CreateTicketLogGroup": {
-            "Type": "AWS::Logs::LogGroup",
-            "Properties": {
-              "LogGroupName": "/aws/lambda/movie-booking-serverless-api-dev-createTicket"
-            }
-          },
-          "UpdateTicketLogGroup": {
-            "Type": "AWS::Logs::LogGroup",
-            "Properties": {
-              "LogGroupName": "/aws/lambda/movie-booking-serverless-api-dev-updateTicket"
-            }
-          },
-          "RemoveTicketLogGroup": {
-            "Type": "AWS::Logs::LogGroup",
-            "Properties": {
-              "LogGroupName": "/aws/lambda/movie-booking-serverless-api-dev-removeTicket"
+              "LogGroupName": "/aws/lambda/movie-booking-serverless-api-dev-api"
             }
           },
           "PriceChangeEventHandlerLogGroup": {
@@ -276,20 +246,20 @@
               }
             }
           },
-          "RetrieveMoviesLambdaFunction": {
+          "ApiLambdaFunction": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
               "Code": {
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1748207639585-2025-05-25T21:13:59.585Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1748297231290-2025-05-26T22:07:11.290Z/movie-booking-serverless-api.zip"
               },
-              "Handler": "handlers/get_handler.get_movies",
-              "Runtime": "python3.12",
-              "FunctionName": "movie-booking-serverless-api-dev-retrieveMovies",
+              "Handler": "app.handler",
+              "Runtime": "python3.11",
+              "FunctionName": "movie-booking-serverless-api-dev-api",
               "MemorySize": 1024,
-              "Timeout": 10,
+              "Timeout": 30,
               "Environment": {
                 "Variables": {
                   "DYNAMODB_TABLE": "ticket-booking",
@@ -306,172 +276,7 @@
               }
             },
             "DependsOn": [
-              "RetrieveMoviesLogGroup"
-            ]
-          },
-          "RetrieveTicketLambdaFunction": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-              "Code": {
-                "S3Bucket": {
-                  "Ref": "ServerlessDeploymentBucket"
-                },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1748207639585-2025-05-25T21:13:59.585Z/movie-booking-serverless-api.zip"
-              },
-              "Handler": "handlers/get_handler.get_ticket",
-              "Runtime": "python3.12",
-              "FunctionName": "movie-booking-serverless-api-dev-retrieveTicket",
-              "MemorySize": 1024,
-              "Timeout": 10,
-              "Environment": {
-                "Variables": {
-                  "DYNAMODB_TABLE": "ticket-booking",
-                  "PRICE_CHANGE_TOPIC_ARN": {
-                    "$ref": "$[\"service\"][\"provider\"][\"environment\"][\"PRICE_CHANGE_TOPIC_ARN\"]"
-                  }
-                }
-              },
-              "Role": {
-                "Fn::GetAtt": [
-                  "IamRoleLambdaExecution",
-                  "Arn"
-                ]
-              }
-            },
-            "DependsOn": [
-              "RetrieveTicketLogGroup"
-            ]
-          },
-          "RetrieveAllTicketsLambdaFunction": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-              "Code": {
-                "S3Bucket": {
-                  "Ref": "ServerlessDeploymentBucket"
-                },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1748207639585-2025-05-25T21:13:59.585Z/movie-booking-serverless-api.zip"
-              },
-              "Handler": "handlers/get_handler.get_all_tickets",
-              "Runtime": "python3.12",
-              "FunctionName": "movie-booking-serverless-api-dev-retrieveAllTickets",
-              "MemorySize": 1024,
-              "Timeout": 10,
-              "Environment": {
-                "Variables": {
-                  "DYNAMODB_TABLE": "ticket-booking",
-                  "PRICE_CHANGE_TOPIC_ARN": {
-                    "$ref": "$[\"service\"][\"provider\"][\"environment\"][\"PRICE_CHANGE_TOPIC_ARN\"]"
-                  }
-                }
-              },
-              "Role": {
-                "Fn::GetAtt": [
-                  "IamRoleLambdaExecution",
-                  "Arn"
-                ]
-              }
-            },
-            "DependsOn": [
-              "RetrieveAllTicketsLogGroup"
-            ]
-          },
-          "CreateTicketLambdaFunction": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-              "Code": {
-                "S3Bucket": {
-                  "Ref": "ServerlessDeploymentBucket"
-                },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1748207639585-2025-05-25T21:13:59.585Z/movie-booking-serverless-api.zip"
-              },
-              "Handler": "handlers/post_handler.create_ticket",
-              "Runtime": "python3.12",
-              "FunctionName": "movie-booking-serverless-api-dev-createTicket",
-              "MemorySize": 1024,
-              "Timeout": 10,
-              "Environment": {
-                "Variables": {
-                  "DYNAMODB_TABLE": "ticket-booking",
-                  "PRICE_CHANGE_TOPIC_ARN": {
-                    "$ref": "$[\"service\"][\"provider\"][\"environment\"][\"PRICE_CHANGE_TOPIC_ARN\"]"
-                  }
-                }
-              },
-              "Role": {
-                "Fn::GetAtt": [
-                  "IamRoleLambdaExecution",
-                  "Arn"
-                ]
-              }
-            },
-            "DependsOn": [
-              "CreateTicketLogGroup"
-            ]
-          },
-          "UpdateTicketLambdaFunction": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-              "Code": {
-                "S3Bucket": {
-                  "Ref": "ServerlessDeploymentBucket"
-                },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1748207639585-2025-05-25T21:13:59.585Z/movie-booking-serverless-api.zip"
-              },
-              "Handler": "handlers/patch_handler.update_ticket",
-              "Runtime": "python3.12",
-              "FunctionName": "movie-booking-serverless-api-dev-updateTicket",
-              "MemorySize": 1024,
-              "Timeout": 10,
-              "Environment": {
-                "Variables": {
-                  "DYNAMODB_TABLE": "ticket-booking",
-                  "PRICE_CHANGE_TOPIC_ARN": {
-                    "$ref": "$[\"service\"][\"provider\"][\"environment\"][\"PRICE_CHANGE_TOPIC_ARN\"]"
-                  }
-                }
-              },
-              "Role": {
-                "Fn::GetAtt": [
-                  "IamRoleLambdaExecution",
-                  "Arn"
-                ]
-              }
-            },
-            "DependsOn": [
-              "UpdateTicketLogGroup"
-            ]
-          },
-          "RemoveTicketLambdaFunction": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-              "Code": {
-                "S3Bucket": {
-                  "Ref": "ServerlessDeploymentBucket"
-                },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1748207639585-2025-05-25T21:13:59.585Z/movie-booking-serverless-api.zip"
-              },
-              "Handler": "handlers/delete_handler.remove_ticket",
-              "Runtime": "python3.12",
-              "FunctionName": "movie-booking-serverless-api-dev-removeTicket",
-              "MemorySize": 1024,
-              "Timeout": 10,
-              "Environment": {
-                "Variables": {
-                  "DYNAMODB_TABLE": "ticket-booking",
-                  "PRICE_CHANGE_TOPIC_ARN": {
-                    "$ref": "$[\"service\"][\"provider\"][\"environment\"][\"PRICE_CHANGE_TOPIC_ARN\"]"
-                  }
-                }
-              },
-              "Role": {
-                "Fn::GetAtt": [
-                  "IamRoleLambdaExecution",
-                  "Arn"
-                ]
-              }
-            },
-            "DependsOn": [
-              "RemoveTicketLogGroup"
+              "ApiLogGroup"
             ]
           },
           "PriceChangeEventHandlerLambdaFunction": {
@@ -481,13 +286,13 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/movie-booking-serverless-api/dev/1748207639585-2025-05-25T21:13:59.585Z/movie-booking-serverless-api.zip"
+                "S3Key": "serverless/movie-booking-serverless-api/dev/1748297231290-2025-05-26T22:07:11.290Z/movie-booking-serverless-api.zip"
               },
-              "Handler": "handlers/event_handler.handle_price_change_event",
-              "Runtime": "python3.12",
+              "Handler": "handlers.event_handler.handle_price_change_event",
+              "Runtime": "python3.11",
               "FunctionName": "movie-booking-serverless-api-dev-priceChangeEventHandler",
               "MemorySize": 1024,
-              "Timeout": 10,
+              "Timeout": 30,
               "Environment": {
                 "Variables": {
                   "DYNAMODB_TABLE": "ticket-booking",
@@ -507,784 +312,24 @@
               "PriceChangeEventHandlerLogGroup"
             ]
           },
-          "RetrieveMoviesLambdaVersion7HUIiC2ZEuSnUFc84pI7b5U25ZU3PLvswUoXoxx874s": {
+          "ApiLambdaVersionkAjbbClRC1ObYbcdqht73k8XW3U2KpyUKJJndtig": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
-                "Ref": "RetrieveMoviesLambdaFunction"
+                "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "AwuLAffN+QdDWSmaas9/t97AmBAd79m1apd3f7zSXa0="
+              "CodeSha256": "uApVJxPsvGVg4OAloHb7SLBTLfTnuPU5zoVf0JhOM7U="
             }
           },
-          "RetrieveTicketLambdaVersionSDEJ0lEeW4bSUYcWr5U9EsjeCvNTNktaB23JZXUHuz4": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "RetrieveTicketLambdaFunction"
-              },
-              "CodeSha256": "AwuLAffN+QdDWSmaas9/t97AmBAd79m1apd3f7zSXa0="
-            }
-          },
-          "RetrieveAllTicketsLambdaVersionG3Jy7zC3aJDacSG8bcqALAP9zF2rB4k00aVOaMgEc": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "RetrieveAllTicketsLambdaFunction"
-              },
-              "CodeSha256": "AwuLAffN+QdDWSmaas9/t97AmBAd79m1apd3f7zSXa0="
-            }
-          },
-          "CreateTicketLambdaVersionS4MyUrKfP4G6mwvWNsTtW30a4qaDmT2ja1anZ49QU": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "CreateTicketLambdaFunction"
-              },
-              "CodeSha256": "AwuLAffN+QdDWSmaas9/t97AmBAd79m1apd3f7zSXa0="
-            }
-          },
-          "UpdateTicketLambdaVersion3QcJTFXbBfvZNQEo35rj6bSrlfTecfzCcdL9S4HCRY": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "UpdateTicketLambdaFunction"
-              },
-              "CodeSha256": "AwuLAffN+QdDWSmaas9/t97AmBAd79m1apd3f7zSXa0="
-            }
-          },
-          "RemoveTicketLambdaVersiones5UN10YoIDHyllFIDkDzFohxxCEV3BAHQT8RsWCg": {
-            "Type": "AWS::Lambda::Version",
-            "DeletionPolicy": "Retain",
-            "Properties": {
-              "FunctionName": {
-                "Ref": "RemoveTicketLambdaFunction"
-              },
-              "CodeSha256": "AwuLAffN+QdDWSmaas9/t97AmBAd79m1apd3f7zSXa0="
-            }
-          },
-          "PriceChangeEventHandlerLambdaVersionEKRPjLKoGpMVwKDhu92VsmtEJEXOMvEUwe1MMlfWN2w": {
+          "PriceChangeEventHandlerLambdaVersion8gxny4ZZrbcNx7rERrm079xQNprtFDGZhB0TzFhT0": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "PriceChangeEventHandlerLambdaFunction"
               },
-              "CodeSha256": "AwuLAffN+QdDWSmaas9/t97AmBAd79m1apd3f7zSXa0="
-            }
-          },
-          "ApiGatewayRestApi": {
-            "Type": "AWS::ApiGateway::RestApi",
-            "Properties": {
-              "Name": "dev-movie-booking-serverless-api",
-              "EndpointConfiguration": {
-                "Types": [
-                  "EDGE"
-                ]
-              },
-              "Policy": ""
-            }
-          },
-          "ApiGatewayResourceMovies": {
-            "Type": "AWS::ApiGateway::Resource",
-            "Properties": {
-              "ParentId": {
-                "Fn::GetAtt": [
-                  "ApiGatewayRestApi",
-                  "RootResourceId"
-                ]
-              },
-              "PathPart": "movies",
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              }
-            }
-          },
-          "ApiGatewayResourceTicket": {
-            "Type": "AWS::ApiGateway::Resource",
-            "Properties": {
-              "ParentId": {
-                "Fn::GetAtt": [
-                  "ApiGatewayRestApi",
-                  "RootResourceId"
-                ]
-              },
-              "PathPart": "ticket",
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              }
-            }
-          },
-          "ApiGatewayResourceTickets": {
-            "Type": "AWS::ApiGateway::Resource",
-            "Properties": {
-              "ParentId": {
-                "Fn::GetAtt": [
-                  "ApiGatewayRestApi",
-                  "RootResourceId"
-                ]
-              },
-              "PathPart": "tickets",
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              }
-            }
-          },
-          "ApiGatewayMethodMoviesOptions": {
-            "Type": "AWS::ApiGateway::Method",
-            "Properties": {
-              "AuthorizationType": "NONE",
-              "HttpMethod": "OPTIONS",
-              "MethodResponses": [
-                {
-                  "StatusCode": "200",
-                  "ResponseParameters": {
-                    "method.response.header.Access-Control-Allow-Origin": true,
-                    "method.response.header.Access-Control-Allow-Headers": true,
-                    "method.response.header.Access-Control-Allow-Methods": true
-                  },
-                  "ResponseModels": {}
-                }
-              ],
-              "RequestParameters": {},
-              "Integration": {
-                "Type": "MOCK",
-                "RequestTemplates": {
-                  "application/json": "{statusCode:200}"
-                },
-                "ContentHandling": "CONVERT_TO_TEXT",
-                "IntegrationResponses": [
-                  {
-                    "StatusCode": "200",
-                    "ResponseParameters": {
-                      "method.response.header.Access-Control-Allow-Origin": "'*'",
-                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
-                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
-                    },
-                    "ResponseTemplates": {
-                      "application/json": ""
-                    }
-                  }
-                ]
-              },
-              "ResourceId": {
-                "Ref": "ApiGatewayResourceMovies"
-              },
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              }
-            }
-          },
-          "ApiGatewayMethodTicketOptions": {
-            "Type": "AWS::ApiGateway::Method",
-            "Properties": {
-              "AuthorizationType": "NONE",
-              "HttpMethod": "OPTIONS",
-              "MethodResponses": [
-                {
-                  "StatusCode": "200",
-                  "ResponseParameters": {
-                    "method.response.header.Access-Control-Allow-Origin": true,
-                    "method.response.header.Access-Control-Allow-Headers": true,
-                    "method.response.header.Access-Control-Allow-Methods": true
-                  },
-                  "ResponseModels": {}
-                }
-              ],
-              "RequestParameters": {},
-              "Integration": {
-                "Type": "MOCK",
-                "RequestTemplates": {
-                  "application/json": "{statusCode:200}"
-                },
-                "ContentHandling": "CONVERT_TO_TEXT",
-                "IntegrationResponses": [
-                  {
-                    "StatusCode": "200",
-                    "ResponseParameters": {
-                      "method.response.header.Access-Control-Allow-Origin": "'*'",
-                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
-                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,PATCH,POST,GET'"
-                    },
-                    "ResponseTemplates": {
-                      "application/json": ""
-                    }
-                  }
-                ]
-              },
-              "ResourceId": {
-                "Ref": "ApiGatewayResourceTicket"
-              },
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              }
-            }
-          },
-          "ApiGatewayMethodTicketsOptions": {
-            "Type": "AWS::ApiGateway::Method",
-            "Properties": {
-              "AuthorizationType": "NONE",
-              "HttpMethod": "OPTIONS",
-              "MethodResponses": [
-                {
-                  "StatusCode": "200",
-                  "ResponseParameters": {
-                    "method.response.header.Access-Control-Allow-Origin": true,
-                    "method.response.header.Access-Control-Allow-Headers": true,
-                    "method.response.header.Access-Control-Allow-Methods": true
-                  },
-                  "ResponseModels": {}
-                }
-              ],
-              "RequestParameters": {},
-              "Integration": {
-                "Type": "MOCK",
-                "RequestTemplates": {
-                  "application/json": "{statusCode:200}"
-                },
-                "ContentHandling": "CONVERT_TO_TEXT",
-                "IntegrationResponses": [
-                  {
-                    "StatusCode": "200",
-                    "ResponseParameters": {
-                      "method.response.header.Access-Control-Allow-Origin": "'*'",
-                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
-                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
-                    },
-                    "ResponseTemplates": {
-                      "application/json": ""
-                    }
-                  }
-                ]
-              },
-              "ResourceId": {
-                "Ref": "ApiGatewayResourceTickets"
-              },
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              }
-            }
-          },
-          "ApiGatewayMethodMoviesGet": {
-            "Type": "AWS::ApiGateway::Method",
-            "Properties": {
-              "HttpMethod": "GET",
-              "RequestParameters": {},
-              "ResourceId": {
-                "Ref": "ApiGatewayResourceMovies"
-              },
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              },
-              "ApiKeyRequired": false,
-              "AuthorizationType": "NONE",
-              "Integration": {
-                "IntegrationHttpMethod": "POST",
-                "Type": "AWS_PROXY",
-                "Uri": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition"
-                      },
-                      ":apigateway:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":lambda:path/2015-03-31/functions/",
-                      {
-                        "Fn::GetAtt": [
-                          "RetrieveMoviesLambdaFunction",
-                          "Arn"
-                        ]
-                      },
-                      "/invocations"
-                    ]
-                  ]
-                }
-              },
-              "MethodResponses": []
-            },
-            "DependsOn": [
-              "RetrieveMoviesLambdaPermissionApiGateway"
-            ]
-          },
-          "ApiGatewayMethodTicketGet": {
-            "Type": "AWS::ApiGateway::Method",
-            "Properties": {
-              "HttpMethod": "GET",
-              "RequestParameters": {},
-              "ResourceId": {
-                "Ref": "ApiGatewayResourceTicket"
-              },
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              },
-              "ApiKeyRequired": false,
-              "AuthorizationType": "NONE",
-              "Integration": {
-                "IntegrationHttpMethod": "POST",
-                "Type": "AWS_PROXY",
-                "Uri": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition"
-                      },
-                      ":apigateway:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":lambda:path/2015-03-31/functions/",
-                      {
-                        "Fn::GetAtt": [
-                          "RetrieveTicketLambdaFunction",
-                          "Arn"
-                        ]
-                      },
-                      "/invocations"
-                    ]
-                  ]
-                }
-              },
-              "MethodResponses": []
-            },
-            "DependsOn": [
-              "RetrieveTicketLambdaPermissionApiGateway"
-            ]
-          },
-          "ApiGatewayMethodTicketsGet": {
-            "Type": "AWS::ApiGateway::Method",
-            "Properties": {
-              "HttpMethod": "GET",
-              "RequestParameters": {},
-              "ResourceId": {
-                "Ref": "ApiGatewayResourceTickets"
-              },
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              },
-              "ApiKeyRequired": false,
-              "AuthorizationType": "NONE",
-              "Integration": {
-                "IntegrationHttpMethod": "POST",
-                "Type": "AWS_PROXY",
-                "Uri": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition"
-                      },
-                      ":apigateway:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":lambda:path/2015-03-31/functions/",
-                      {
-                        "Fn::GetAtt": [
-                          "RetrieveAllTicketsLambdaFunction",
-                          "Arn"
-                        ]
-                      },
-                      "/invocations"
-                    ]
-                  ]
-                }
-              },
-              "MethodResponses": []
-            },
-            "DependsOn": [
-              "RetrieveAllTicketsLambdaPermissionApiGateway"
-            ]
-          },
-          "ApiGatewayMethodTicketPost": {
-            "Type": "AWS::ApiGateway::Method",
-            "Properties": {
-              "HttpMethod": "POST",
-              "RequestParameters": {},
-              "ResourceId": {
-                "Ref": "ApiGatewayResourceTicket"
-              },
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              },
-              "ApiKeyRequired": false,
-              "AuthorizationType": "NONE",
-              "Integration": {
-                "IntegrationHttpMethod": "POST",
-                "Type": "AWS_PROXY",
-                "Uri": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition"
-                      },
-                      ":apigateway:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":lambda:path/2015-03-31/functions/",
-                      {
-                        "Fn::GetAtt": [
-                          "CreateTicketLambdaFunction",
-                          "Arn"
-                        ]
-                      },
-                      "/invocations"
-                    ]
-                  ]
-                }
-              },
-              "MethodResponses": []
-            },
-            "DependsOn": [
-              "CreateTicketLambdaPermissionApiGateway"
-            ]
-          },
-          "ApiGatewayMethodTicketPatch": {
-            "Type": "AWS::ApiGateway::Method",
-            "Properties": {
-              "HttpMethod": "PATCH",
-              "RequestParameters": {},
-              "ResourceId": {
-                "Ref": "ApiGatewayResourceTicket"
-              },
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              },
-              "ApiKeyRequired": false,
-              "AuthorizationType": "NONE",
-              "Integration": {
-                "IntegrationHttpMethod": "POST",
-                "Type": "AWS_PROXY",
-                "Uri": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition"
-                      },
-                      ":apigateway:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":lambda:path/2015-03-31/functions/",
-                      {
-                        "Fn::GetAtt": [
-                          "UpdateTicketLambdaFunction",
-                          "Arn"
-                        ]
-                      },
-                      "/invocations"
-                    ]
-                  ]
-                }
-              },
-              "MethodResponses": []
-            },
-            "DependsOn": [
-              "UpdateTicketLambdaPermissionApiGateway"
-            ]
-          },
-          "ApiGatewayMethodTicketDelete": {
-            "Type": "AWS::ApiGateway::Method",
-            "Properties": {
-              "HttpMethod": "DELETE",
-              "RequestParameters": {},
-              "ResourceId": {
-                "Ref": "ApiGatewayResourceTicket"
-              },
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              },
-              "ApiKeyRequired": false,
-              "AuthorizationType": "NONE",
-              "Integration": {
-                "IntegrationHttpMethod": "POST",
-                "Type": "AWS_PROXY",
-                "Uri": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition"
-                      },
-                      ":apigateway:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":lambda:path/2015-03-31/functions/",
-                      {
-                        "Fn::GetAtt": [
-                          "RemoveTicketLambdaFunction",
-                          "Arn"
-                        ]
-                      },
-                      "/invocations"
-                    ]
-                  ]
-                }
-              },
-              "MethodResponses": []
-            },
-            "DependsOn": [
-              "RemoveTicketLambdaPermissionApiGateway"
-            ]
-          },
-          "ApiGatewayDeployment1748207635677": {
-            "Type": "AWS::ApiGateway::Deployment",
-            "Properties": {
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              },
-              "StageName": "dev"
-            },
-            "DependsOn": [
-              "ApiGatewayMethodMoviesOptions",
-              "ApiGatewayMethodTicketOptions",
-              "ApiGatewayMethodTicketsOptions",
-              "ApiGatewayMethodMoviesGet",
-              "ApiGatewayMethodTicketGet",
-              "ApiGatewayMethodTicketsGet",
-              "ApiGatewayMethodTicketPost",
-              "ApiGatewayMethodTicketPatch",
-              "ApiGatewayMethodTicketDelete"
-            ]
-          },
-          "RetrieveMoviesLambdaPermissionApiGateway": {
-            "Type": "AWS::Lambda::Permission",
-            "Properties": {
-              "FunctionName": {
-                "Fn::GetAtt": [
-                  "RetrieveMoviesLambdaFunction",
-                  "Arn"
-                ]
-              },
-              "Action": "lambda:InvokeFunction",
-              "Principal": "apigateway.amazonaws.com",
-              "SourceArn": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition"
-                    },
-                    ":execute-api:",
-                    {
-                      "Ref": "AWS::Region"
-                    },
-                    ":",
-                    {
-                      "Ref": "AWS::AccountId"
-                    },
-                    ":",
-                    {
-                      "Ref": "ApiGatewayRestApi"
-                    },
-                    "/*/*"
-                  ]
-                ]
-              }
-            }
-          },
-          "RetrieveTicketLambdaPermissionApiGateway": {
-            "Type": "AWS::Lambda::Permission",
-            "Properties": {
-              "FunctionName": {
-                "Fn::GetAtt": [
-                  "RetrieveTicketLambdaFunction",
-                  "Arn"
-                ]
-              },
-              "Action": "lambda:InvokeFunction",
-              "Principal": "apigateway.amazonaws.com",
-              "SourceArn": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition"
-                    },
-                    ":execute-api:",
-                    {
-                      "Ref": "AWS::Region"
-                    },
-                    ":",
-                    {
-                      "Ref": "AWS::AccountId"
-                    },
-                    ":",
-                    {
-                      "Ref": "ApiGatewayRestApi"
-                    },
-                    "/*/*"
-                  ]
-                ]
-              }
-            }
-          },
-          "RetrieveAllTicketsLambdaPermissionApiGateway": {
-            "Type": "AWS::Lambda::Permission",
-            "Properties": {
-              "FunctionName": {
-                "Fn::GetAtt": [
-                  "RetrieveAllTicketsLambdaFunction",
-                  "Arn"
-                ]
-              },
-              "Action": "lambda:InvokeFunction",
-              "Principal": "apigateway.amazonaws.com",
-              "SourceArn": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition"
-                    },
-                    ":execute-api:",
-                    {
-                      "Ref": "AWS::Region"
-                    },
-                    ":",
-                    {
-                      "Ref": "AWS::AccountId"
-                    },
-                    ":",
-                    {
-                      "Ref": "ApiGatewayRestApi"
-                    },
-                    "/*/*"
-                  ]
-                ]
-              }
-            }
-          },
-          "CreateTicketLambdaPermissionApiGateway": {
-            "Type": "AWS::Lambda::Permission",
-            "Properties": {
-              "FunctionName": {
-                "Fn::GetAtt": [
-                  "CreateTicketLambdaFunction",
-                  "Arn"
-                ]
-              },
-              "Action": "lambda:InvokeFunction",
-              "Principal": "apigateway.amazonaws.com",
-              "SourceArn": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition"
-                    },
-                    ":execute-api:",
-                    {
-                      "Ref": "AWS::Region"
-                    },
-                    ":",
-                    {
-                      "Ref": "AWS::AccountId"
-                    },
-                    ":",
-                    {
-                      "Ref": "ApiGatewayRestApi"
-                    },
-                    "/*/*"
-                  ]
-                ]
-              }
-            }
-          },
-          "UpdateTicketLambdaPermissionApiGateway": {
-            "Type": "AWS::Lambda::Permission",
-            "Properties": {
-              "FunctionName": {
-                "Fn::GetAtt": [
-                  "UpdateTicketLambdaFunction",
-                  "Arn"
-                ]
-              },
-              "Action": "lambda:InvokeFunction",
-              "Principal": "apigateway.amazonaws.com",
-              "SourceArn": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition"
-                    },
-                    ":execute-api:",
-                    {
-                      "Ref": "AWS::Region"
-                    },
-                    ":",
-                    {
-                      "Ref": "AWS::AccountId"
-                    },
-                    ":",
-                    {
-                      "Ref": "ApiGatewayRestApi"
-                    },
-                    "/*/*"
-                  ]
-                ]
-              }
-            }
-          },
-          "RemoveTicketLambdaPermissionApiGateway": {
-            "Type": "AWS::Lambda::Permission",
-            "Properties": {
-              "FunctionName": {
-                "Fn::GetAtt": [
-                  "RemoveTicketLambdaFunction",
-                  "Arn"
-                ]
-              },
-              "Action": "lambda:InvokeFunction",
-              "Principal": "apigateway.amazonaws.com",
-              "SourceArn": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition"
-                    },
-                    ":execute-api:",
-                    {
-                      "Ref": "AWS::Region"
-                    },
-                    ":",
-                    {
-                      "Ref": "AWS::AccountId"
-                    },
-                    ":",
-                    {
-                      "Ref": "ApiGatewayRestApi"
-                    },
-                    "/*/*"
-                  ]
-                ]
-              }
+              "CodeSha256": "uApVJxPsvGVg4OAloHb7SLBTLfTnuPU5zoVf0JhOM7U="
             }
           },
           "PriceChangeEventHandlerEventSourceMappingSQSPriceChangeQueue": {
@@ -1308,6 +353,119 @@
               },
               "Enabled": true
             }
+          },
+          "HttpApi": {
+            "Type": "AWS::ApiGatewayV2::Api",
+            "Properties": {
+              "Name": "dev-movie-booking-serverless-api",
+              "ProtocolType": "HTTP"
+            }
+          },
+          "HttpApiStage": {
+            "Type": "AWS::ApiGatewayV2::Stage",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "StageName": "$default",
+              "AutoDeploy": true,
+              "DefaultRouteSettings": {
+                "DetailedMetricsEnabled": false
+              }
+            }
+          },
+          "ApiLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ApiLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationApi": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"ApiLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteAnyProxyVar": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "ANY /{proxy+}",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationApi"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationApi"
+          },
+          "HttpApiRouteAny": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "ANY /",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationApi"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationApi"
           },
           "PriceChangeTopic": {
             "Type": "AWS::SNS::Topic",
@@ -1384,78 +542,42 @@
               "Name": "sls-movie-booking-serverless-api-dev-ServerlessDeploymentBucketName"
             }
           },
-          "RetrieveMoviesLambdaFunctionQualifiedArn": {
+          "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "RetrieveMoviesLambdaVersion7HUIiC2ZEuSnUFc84pI7b5U25ZU3PLvswUoXoxx874s"
+              "Ref": "ApiLambdaVersionkAjbbClRC1ObYbcdqht73k8XW3U2KpyUKJJndtig"
             },
             "Export": {
-              "Name": "sls-movie-booking-serverless-api-dev-RetrieveMoviesLambdaFunctionQualifiedArn"
-            }
-          },
-          "RetrieveTicketLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "RetrieveTicketLambdaVersionSDEJ0lEeW4bSUYcWr5U9EsjeCvNTNktaB23JZXUHuz4"
-            },
-            "Export": {
-              "Name": "sls-movie-booking-serverless-api-dev-RetrieveTicketLambdaFunctionQualifiedArn"
-            }
-          },
-          "RetrieveAllTicketsLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "RetrieveAllTicketsLambdaVersionG3Jy7zC3aJDacSG8bcqALAP9zF2rB4k00aVOaMgEc"
-            },
-            "Export": {
-              "Name": "sls-movie-booking-serverless-api-dev-RetrieveAllTicketsLambdaFunctionQualifiedArn"
-            }
-          },
-          "CreateTicketLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "CreateTicketLambdaVersionS4MyUrKfP4G6mwvWNsTtW30a4qaDmT2ja1anZ49QU"
-            },
-            "Export": {
-              "Name": "sls-movie-booking-serverless-api-dev-CreateTicketLambdaFunctionQualifiedArn"
-            }
-          },
-          "UpdateTicketLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "UpdateTicketLambdaVersion3QcJTFXbBfvZNQEo35rj6bSrlfTecfzCcdL9S4HCRY"
-            },
-            "Export": {
-              "Name": "sls-movie-booking-serverless-api-dev-UpdateTicketLambdaFunctionQualifiedArn"
-            }
-          },
-          "RemoveTicketLambdaFunctionQualifiedArn": {
-            "Description": "Current Lambda function version",
-            "Value": {
-              "Ref": "RemoveTicketLambdaVersiones5UN10YoIDHyllFIDkDzFohxxCEV3BAHQT8RsWCg"
-            },
-            "Export": {
-              "Name": "sls-movie-booking-serverless-api-dev-RemoveTicketLambdaFunctionQualifiedArn"
+              "Name": "sls-movie-booking-serverless-api-dev-ApiLambdaFunctionQualifiedArn"
             }
           },
           "PriceChangeEventHandlerLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "PriceChangeEventHandlerLambdaVersionEKRPjLKoGpMVwKDhu92VsmtEJEXOMvEUwe1MMlfWN2w"
+              "Ref": "PriceChangeEventHandlerLambdaVersion8gxny4ZZrbcNx7rERrm079xQNprtFDGZhB0TzFhT0"
             },
             "Export": {
               "Name": "sls-movie-booking-serverless-api-dev-PriceChangeEventHandlerLambdaFunctionQualifiedArn"
             }
           },
-          "ServiceEndpoint": {
-            "Description": "URL of the service endpoint",
+          "HttpApiId": {
+            "Description": "Id of the HTTP API",
+            "Value": {
+              "Ref": "HttpApi"
+            },
+            "Export": {
+              "Name": "sls-movie-booking-serverless-api-dev-HttpApiId"
+            }
+          },
+          "HttpApiUrl": {
+            "Description": "URL of the HTTP API",
             "Value": {
               "Fn::Join": [
                 "",
                 [
                   "https://",
                   {
-                    "Ref": "ApiGatewayRestApi"
+                    "Ref": "HttpApi"
                   },
                   ".execute-api.",
                   {
@@ -1464,13 +586,12 @@
                   ".",
                   {
                     "Ref": "AWS::URLSuffix"
-                  },
-                  "/dev"
+                  }
                 ]
               ]
             },
             "Export": {
-              "Name": "sls-movie-booking-serverless-api-dev-ServiceEndpoint"
+              "Name": "sls-movie-booking-serverless-api-dev-HttpApiUrl"
             }
           }
         }
@@ -1569,242 +690,53 @@
     ],
     "pluginsData": {},
     "functions": {
-      "retrieveMovies": {
-        "handler": "handlers/get_handler.get_movies",
+      "api": {
+        "handler": "app.handler",
         "events": [
           {
-            "http": {
-              "path": "movies",
-              "method": "get",
-              "cors": {
-                "origin": "*",
-                "methods": [
-                  "OPTIONS",
-                  "GET"
-                ],
-                "headers": [
-                  "Content-Type",
-                  "X-Amz-Date",
-                  "Authorization",
-                  "X-Api-Key",
-                  "X-Amz-Security-Token",
-                  "X-Amz-User-Agent",
-                  "X-Amzn-Trace-Id"
-                ],
-                "allowCredentials": false
-              },
-              "integration": "AWS_PROXY"
-            }
-          }
-        ],
-        "name": "movie-booking-serverless-api-dev-retrieveMovies",
-        "package": {},
-        "memory": 1024,
-        "timeout": 10,
-        "runtime": "python3.12",
-        "vpc": {},
-        "versionLogicalId": "RetrieveMoviesLambdaVersion7HUIiC2ZEuSnUFc84pI7b5U25ZU3PLvswUoXoxx874s"
-      },
-      "retrieveTicket": {
-        "handler": "handlers/get_handler.get_ticket",
-        "events": [
+            "httpApi": {
+              "path": "/{proxy+}",
+              "method": "ANY"
+            },
+            "resolvedMethod": "ANY",
+            "resolvedPath": "/{proxy+}"
+          },
           {
-            "http": {
-              "path": "ticket",
-              "method": "get",
-              "cors": {
-                "origin": "*",
-                "methods": [
-                  "OPTIONS",
-                  "GET"
-                ],
-                "headers": [
-                  "Content-Type",
-                  "X-Amz-Date",
-                  "Authorization",
-                  "X-Api-Key",
-                  "X-Amz-Security-Token",
-                  "X-Amz-User-Agent",
-                  "X-Amzn-Trace-Id"
-                ],
-                "allowCredentials": false
-              },
-              "integration": "AWS_PROXY"
-            }
+            "httpApi": {
+              "path": "/",
+              "method": "ANY"
+            },
+            "resolvedMethod": "ANY",
+            "resolvedPath": "/"
           }
         ],
-        "name": "movie-booking-serverless-api-dev-retrieveTicket",
+        "name": "movie-booking-serverless-api-dev-api",
         "package": {},
         "memory": 1024,
-        "timeout": 10,
-        "runtime": "python3.12",
+        "timeout": 30,
+        "runtime": "python3.11",
         "vpc": {},
-        "versionLogicalId": "RetrieveTicketLambdaVersionSDEJ0lEeW4bSUYcWr5U9EsjeCvNTNktaB23JZXUHuz4"
-      },
-      "retrieveAllTickets": {
-        "handler": "handlers/get_handler.get_all_tickets",
-        "events": [
-          {
-            "http": {
-              "path": "tickets",
-              "method": "get",
-              "cors": {
-                "origin": "*",
-                "methods": [
-                  "OPTIONS",
-                  "GET"
-                ],
-                "headers": [
-                  "Content-Type",
-                  "X-Amz-Date",
-                  "Authorization",
-                  "X-Api-Key",
-                  "X-Amz-Security-Token",
-                  "X-Amz-User-Agent",
-                  "X-Amzn-Trace-Id"
-                ],
-                "allowCredentials": false
-              },
-              "integration": "AWS_PROXY"
-            }
-          }
-        ],
-        "name": "movie-booking-serverless-api-dev-retrieveAllTickets",
-        "package": {},
-        "memory": 1024,
-        "timeout": 10,
-        "runtime": "python3.12",
-        "vpc": {},
-        "versionLogicalId": "RetrieveAllTicketsLambdaVersionG3Jy7zC3aJDacSG8bcqALAP9zF2rB4k00aVOaMgEc"
-      },
-      "createTicket": {
-        "handler": "handlers/post_handler.create_ticket",
-        "events": [
-          {
-            "http": {
-              "path": "ticket",
-              "method": "post",
-              "cors": {
-                "origin": "*",
-                "methods": [
-                  "OPTIONS",
-                  "POST"
-                ],
-                "headers": [
-                  "Content-Type",
-                  "X-Amz-Date",
-                  "Authorization",
-                  "X-Api-Key",
-                  "X-Amz-Security-Token",
-                  "X-Amz-User-Agent",
-                  "X-Amzn-Trace-Id"
-                ],
-                "allowCredentials": false
-              },
-              "integration": "AWS_PROXY"
-            }
-          }
-        ],
-        "name": "movie-booking-serverless-api-dev-createTicket",
-        "package": {},
-        "memory": 1024,
-        "timeout": 10,
-        "runtime": "python3.12",
-        "vpc": {},
-        "versionLogicalId": "CreateTicketLambdaVersionS4MyUrKfP4G6mwvWNsTtW30a4qaDmT2ja1anZ49QU"
-      },
-      "updateTicket": {
-        "handler": "handlers/patch_handler.update_ticket",
-        "events": [
-          {
-            "http": {
-              "path": "ticket",
-              "method": "patch",
-              "cors": {
-                "origin": "*",
-                "methods": [
-                  "OPTIONS",
-                  "PATCH"
-                ],
-                "headers": [
-                  "Content-Type",
-                  "X-Amz-Date",
-                  "Authorization",
-                  "X-Api-Key",
-                  "X-Amz-Security-Token",
-                  "X-Amz-User-Agent",
-                  "X-Amzn-Trace-Id"
-                ],
-                "allowCredentials": false
-              },
-              "integration": "AWS_PROXY"
-            }
-          }
-        ],
-        "name": "movie-booking-serverless-api-dev-updateTicket",
-        "package": {},
-        "memory": 1024,
-        "timeout": 10,
-        "runtime": "python3.12",
-        "vpc": {},
-        "versionLogicalId": "UpdateTicketLambdaVersion3QcJTFXbBfvZNQEo35rj6bSrlfTecfzCcdL9S4HCRY"
-      },
-      "removeTicket": {
-        "handler": "handlers/delete_handler.remove_ticket",
-        "events": [
-          {
-            "http": {
-              "path": "ticket",
-              "method": "delete",
-              "cors": {
-                "origin": "*",
-                "methods": [
-                  "OPTIONS",
-                  "DELETE"
-                ],
-                "headers": [
-                  "Content-Type",
-                  "X-Amz-Date",
-                  "Authorization",
-                  "X-Api-Key",
-                  "X-Amz-Security-Token",
-                  "X-Amz-User-Agent",
-                  "X-Amzn-Trace-Id"
-                ],
-                "allowCredentials": false
-              },
-              "integration": "AWS_PROXY"
-            }
-          }
-        ],
-        "name": "movie-booking-serverless-api-dev-removeTicket",
-        "package": {},
-        "memory": 1024,
-        "timeout": 10,
-        "runtime": "python3.12",
-        "vpc": {},
-        "versionLogicalId": "RemoveTicketLambdaVersiones5UN10YoIDHyllFIDkDzFohxxCEV3BAHQT8RsWCg"
+        "versionLogicalId": "ApiLambdaVersionkAjbbClRC1ObYbcdqht73k8XW3U2KpyUKJJndtig"
       },
       "priceChangeEventHandler": {
-        "handler": "handlers/event_handler.handle_price_change_event",
+        "handler": "handlers.event_handler.handle_price_change_event",
         "events": [
           {
             "sqs": {
               "arn": {
                 "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"IamRoleLambdaExecution\"][\"Properties\"][\"Policies\"][0][\"PolicyDocument\"][\"Statement\"][5][\"Resource\"][0]"
               },
-              "batchSize": 1,
-              "maximumBatchingWindowInSeconds": 0
+              "batchSize": 1
             }
           }
         ],
         "name": "movie-booking-serverless-api-dev-priceChangeEventHandler",
         "package": {},
         "memory": 1024,
-        "timeout": 10,
-        "runtime": "python3.12",
+        "timeout": 30,
+        "runtime": "python3.11",
         "vpc": {},
-        "versionLogicalId": "PriceChangeEventHandlerLambdaVersionEKRPjLKoGpMVwKDhu92VsmtEJEXOMvEUwe1MMlfWN2w"
+        "versionLogicalId": "PriceChangeEventHandlerLambdaVersion8gxny4ZZrbcNx7rERrm079xQNprtFDGZhB0TzFhT0"
       }
     },
     "resources": {
@@ -1881,7 +813,7 @@
     "serviceFilename": "serverless.yml",
     "initialServerlessConfig": {
       "service": "movie-booking-serverless-api",
-      "frameworkVersion": "3",
+      "frameworkVersion": "^3.0.0",
       "provider": {
         "$ref": "$[\"service\"][\"provider\"]"
       },
@@ -1907,16 +839,16 @@
           "!package-lock.json"
         ],
         "artifactsS3KeyDirname": "serverless/movie-booking-serverless-api/dev/code-artifacts",
-        "artifact": "/workspaces/MC_Intern/Movie_Ticket_Booking/Using_ServerlessFramework/.serverless/movie-booking-serverless-api.zip",
-        "artifactDirectoryName": "serverless/movie-booking-serverless-api/dev/1748207639585-2025-05-25T21:13:59.585Z"
+        "artifact": "/Users/devanshvarshney/MC_Intern/Movie_Ticket_Booking/Using_ServerlessFramework/.serverless/movie-booking-serverless-api.zip",
+        "artifactDirectoryName": "serverless/movie-booking-serverless-api/dev/1748297231290-2025-05-26T22:07:11.290Z"
       }
     },
     "layers": {},
     "isDashboardMonitoringPreconfigured": false,
-    "artifact": "/workspaces/MC_Intern/Movie_Ticket_Booking/Using_ServerlessFramework/.serverless/movie-booking-serverless-api.zip"
+    "artifact": "/Users/devanshvarshney/MC_Intern/Movie_Ticket_Booking/Using_ServerlessFramework/.serverless/movie-booking-serverless-api.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/movie-booking-serverless-api/dev/1748207639585-2025-05-25T21:13:59.585Z",
+    "artifactDirectoryName": "serverless/movie-booking-serverless-api/dev/1748297231290-2025-05-26T22:07:11.290Z",
     "artifact": "movie-booking-serverless-api.zip"
   }
 }
