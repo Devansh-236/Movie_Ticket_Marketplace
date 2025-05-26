@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Setting up Movie Booking Serverless API with LocalStack..."
+echo "🚀 Setting up Movie Booking FastAPI with LocalStack..."
 
 # Check if Python 3.11 is installed
 if ! command -v python3.11 &> /dev/null; then
@@ -25,10 +25,6 @@ pip install --upgrade pip
 echo "📚 Installing Python dependencies..."
 pip install -r requirements.txt
 
-# Install Node.js dependencies
-echo "📦 Installing Node.js dependencies..."
-npm install
-
 # Install AWS CLI Local (awslocal)
 echo "🔧 Installing AWS CLI Local..."
 pip install awscli-local
@@ -45,6 +41,6 @@ echo "✅ Setup complete!"
 echo ""
 echo "Next steps:"
 echo "1. Activate the virtual environment: source venv/bin/activate"
-echo "2. Start LocalStack: npm run localstack-start"
-echo "3. Setup LocalStack resources: npm run localstack-setup"
-echo "4. Deploy the application: npm run deploy-local"
+echo "2. Start LocalStack: docker-compose up -d"
+echo "3. Setup LocalStack resources: ./localstack-setup.sh"
+echo "4. Start the FastAPI server: uvicorn main:app --reload --host 0.0.0.0 --port 8000"
