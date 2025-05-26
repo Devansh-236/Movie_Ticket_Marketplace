@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query, Body
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, Any, Dict
 import boto3
 import json
@@ -15,26 +15,29 @@ logger = logging.getLogger(__name__)
 
 # Pydantic models
 class TicketCreate(BaseModel):
-    theatre_seat: str = Body(..., alias="Theatre-Seat")
-    movie: str = Body(..., alias="Movie")
+    theatre_seat: str = Field(..., alias="Theatre-Seat")
+    movie: str = Field(..., alias="Movie")
     price: Optional[float] = None
     
     class Config:
         populate_by_name = True
+        allow_population_by_field_name = True
 
 class TicketUpdate(BaseModel):
-    theatre_seat: str = Body(..., alias="Theatre-Seat")
-    update_key: str = Body(..., alias="updateKey")
-    update_value: Any = Body(..., alias="updateValue")
+    theatre_seat: str = Field(..., alias="Theatre-Seat")
+    update_key: str = Field(..., alias="updateKey")
+    update_value: Any = Field(..., alias="updateValue")
     
     class Config:
         populate_by_name = True
+        allow_population_by_field_name = True
 
 class TicketDelete(BaseModel):
-    theatre_seat: str = Body(..., alias="Theatre-Seat")
+    theatre_seat: str = Field(..., alias="Theatre-Seat")
     
     class Config:
         populate_by_name = True
+        allow_population_by_field_name = True
 
 # SNS setup
 sns = boto3.client('sns')

@@ -10,7 +10,12 @@
     "remove": "serverless remove",
     "logs": "serverless logs -f",
     "invoke": "serverless invoke -f",
-    "offline": "serverless offline"
+    "offline": "serverless offline",
+    "test": "pytest",
+    "test-coverage": "pytest --cov=app --cov=handlers --cov=utils --cov-report=html --cov-report=term-missing",
+    "test-coverage-xml": "pytest --cov=app --cov=handlers --cov=utils --cov-report=xml",
+    "test-verbose": "pytest -v -s",
+    "test-watch": "pytest-watch"
   },
   "keywords": [
     "serverless",
