@@ -11,9 +11,9 @@ const TicketList = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
 
-    const { data: ticketsData, loading, error, refetch } = useApi(ticketAPI.getAllTickets);
+    const { data: ticketsData, loading, error, refetch } = useApi(ticketAPI.getAllTickets, []);
 
-    const tickets = ticketsData?.tickets || [];
+    const tickets = ticketsData?.tickets || ticketsData?.Items || ticketsData || [];
 
     const filteredTickets = tickets.filter(ticket => {
         const matchesSearch = ticket.Movie?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -27,7 +27,7 @@ const TicketList = () => {
     });
 
     if (loading) return <LoadingSpinner text="Loading tickets..." />;
-    if (error) return <ErrorMessage message={error.message} onRetry={refetch} />;
+    if (error) return <ErrorMessage error={error} onRetry={refetch} />;
 
     return (
         <div className="page-container">

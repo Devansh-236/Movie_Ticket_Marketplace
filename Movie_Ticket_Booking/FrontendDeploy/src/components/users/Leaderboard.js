@@ -12,7 +12,7 @@ const Leaderboard = () => {
 
     const { data: leaderboardData, loading, error, refetch } = useApi(
         () => userAPI.getLeaderboard(limit, order),
-        [limit, order]
+        [limit, order] // Dependencies on limit and order
     );
 
     const leaderboard = leaderboardData?.leaderboard || [];

@@ -3,11 +3,15 @@ import { FiSearch, FiUser, FiDollarSign, FiTrendingUp, FiTrendingDown } from 're
 import { userAPI } from '../../services/api';
 import LoadingSpinner from '../common/LoadingSpinner';
 import toast from 'react-hot-toast';
+import { useApi } from '../../hooks/useApi';
 
 const UserProfile = () => {
     const [userId, setUserId] = useState('');
-    const [userSummary, setUserSummary] = useState(null);
-    const [loading, setLoading] = useState(false);
+
+    const { data: userData, loading, error } = useApi(
+        () => userId ? userAPI.getUserSummary(userId) : null,
+        [userId]
+    );
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -15,17 +19,6 @@ const UserProfile = () => {
         if (!userId.trim()) {
             toast.error('Please enter a user ID');
             return;
-        }
-
-        setLoading(true);
-        try {
-            const response = await userAPI.getUserSummary(userId);
-            setUserSummary(response.data);
-        } catch (error) {
-            toast.error(error.response?.data?.detail || 'User not found');
-            setUserSummary(null);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -58,7 +51,7 @@ const UserProfile = () => {
 
             {loading && <LoadingSpinner text="Loading user data..." />}
 
-            {userSummary && (
+            {userData && (
                 <div className="user-summary">
                     <div className="user-info-card">
                         <div className="card-header">
@@ -69,30 +62,30 @@ const UserProfile = () => {
                         <div className="user-details">
                             <div className="detail-item">
                                 <span className="detail-label">User ID:</span>
-                                <span className="detail-value">{userSummary.user_info.userId}</span>
+                                <span className="detail-value">{userData.user_info.userId}</span>
                             </div>
 
                             <div className="detail-item">
                                 <span className="detail-label">Name:</span>
-                                <span className="detail-value">{userSummary.user_info.name}</span>
+                                <span className="detail-value">{userData.user_info.name}</span>
                             </div>
 
                             <div className="detail-item">
                                 <span className="detail-label">Email:</span>
-                                <span className="detail-value">{userSummary.user_info.email}</span>
+                                <span className="detail-value">{userData.user_info.email}</span>
                             </div>
 
                             <div className="detail-item">
                                 <span className="detail-label">Status:</span>
-                                <span className={`status-badge ${userSummary.user_info.status.toLowerCase()}`}>
-                                    {userSummary.user_info.status}
+                                <span className={`status-badge ${userData.user_info.status.toLowerCase()}`}>
+                                    {userData.user_info.status}
                                 </span>
                             </div>
 
                             <div className="detail-item">
                                 <span className="detail-label">Member Since:</span>
                                 <span className="detail-value">
-                                    {new Date(userSummary.user_info.member_since).toLocaleDateString()}
+                                    {new Date(userData.user_info.member_since).toLocaleDateString()}
                                 </span>
                             </div>
                         </div>
@@ -106,7 +99,7 @@ const UserProfile = () => {
                                 </div>
                                 <div className="card-content">
                                     <h3>Current Balance</h3>
-                                    <p className="amount">${userSummary.financial_summary.current_balance.toFixed(2)}</p>
+                                    <p className="amount">${userData.financial_summary.current_balance.toFixed(2)}</p>
                                 </div>
                             </div>
 
@@ -116,7 +109,7 @@ const UserProfile = () => {
                                 </div>
                                 <div className="card-content">
                                     <h3>Total Purchases</h3>
-                                    <p className="amount negative">${userSummary.financial_summary.total_purchases.toFixed(2)}</p>
+                                    <p className="amount negative">${userData.financial_summary.total_purchases.toFixed(2)}</p>
                                 </div>
                             </div>
 
@@ -126,32 +119,32 @@ const UserProfile = () => {
                                 </div>
                                 <div className="card-content">
                                     <h3>Total Sales</h3>
-                                    <p className="amount positive">${userSummary.financial_summary.total_sales.toFixed(2)}</p>
+                                    <p className="amount positive">${userData.financial_summary.total_sales.toFixed(2)}</p>
                                 </div>
                             </div>
 
                             <div className="summary-card">
-                                <div className={`card-icon ${userSummary.financial_summary.is_net_positive ? 'profit' : 'loss'}`}>
-                                    {userSummary.financial_summary.is_net_positive ?
+                                <div className={`card-icon ${userData.financial_summary.is_net_positive ? 'profit' : 'loss'}`}>
+                                    {userData.financial_summary.is_net_positive ?
                                         <FiTrendingUp size={24} /> :
                                         <FiTrendingDown size={24} />
                                     }
                                 </div>
                                 <div className="card-content">
                                     <h3>Net P&L</h3>
-                                    <p className={`amount ${userSummary.financial_summary.is_net_positive ? 'positive' : 'negative'}`}>
-                                        ${userSummary.financial_summary.net_profit_loss.toFixed(2)}
+                                    <p className={`amount ${userData.financial_summary.is_net_positive ? 'positive' : 'negative'}`}>
+                                        ${userData.financial_summary.net_profit_loss.toFixed(2)}
                                     </p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {userSummary.recent_transactions && userSummary.recent_transactions.length > 0 && (
+                    {userData.recent_transactions && userData.recent_transactions.length > 0 && (
                         <div className="recent-transactions">
                             <h3>Recent Transactions</h3>
                             <div className="transactions-list">
-                                {userSummary.recent_transactions.map((transaction, index) => (
+                                {userData.recent_transactions.map((transaction, index) => (
                                     <div key={index} className="transaction-item">
                                         <div className="transaction-info">
                                             <span className="transaction-type">{transaction.transactionType}</span>
