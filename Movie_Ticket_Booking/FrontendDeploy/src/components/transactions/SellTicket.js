@@ -7,14 +7,16 @@ const SellTicket = ({ onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
         user_id: '',
         theatre_seat: '',
-        sale_price: ''
+        sale_price: '',
+        buyer_id: ''  // Added missing field
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.user_id || !formData.theatre_seat || !formData.sale_price) {
+        // Updated validation to include buyer_id
+        if (!formData.user_id || !formData.theatre_seat || !formData.sale_price || !formData.buyer_id) {
             toast.error('Please fill in all required fields');
             return;
         }
@@ -24,13 +26,40 @@ const SellTicket = ({ onClose, onSuccess }) => {
             await transactionAPI.sellTicket({
                 user_id: formData.user_id,
                 theatre_seat: formData.theatre_seat,
-                sale_price: parseFloat(formData.sale_price)
+                sale_price: parseInt(formData.sale_price, 10),
+                buyer_id: formData.buyer_id  // Added missing field
             });
 
             toast.success('Ticket sold successfully');
             onSuccess();
         } catch (error) {
-            toast.error(error.response?.data?.detail || 'Failed to sell ticket');
+            console.error('Sell ticket error:', error);
+
+            let errorMessage = 'Failed to sell ticket';
+
+            if (error.response?.data?.detail) {
+                if (Array.isArray(error.response.data.detail)) {
+                    const messages = error.response.data.detail
+                        .map(err => {
+                            if (typeof err === 'string') return err;
+                            if (err.msg && err.loc) return `${err.loc.join('.')} - ${err.msg}`;
+                            if (err.msg) return err.msg;
+                            if (err.message) return err.message;
+                            return 'Validation error';
+                        })
+                        .filter(msg => msg && msg.trim() !== '');
+
+                    errorMessage = messages.length > 0 ? messages.join(', ') : 'Validation failed';
+                } else if (typeof error.response.data.detail === 'string') {
+                    errorMessage = error.response.data.detail;
+                }
+            } else if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
@@ -38,10 +67,19 @@ const SellTicket = ({ onClose, onSuccess }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+
+        if (name === 'sale_price') {
+            const integerValue = value.replace(/[^\d]/g, '');
+            setFormData(prev => ({
+                ...prev,
+                [name]: integerValue
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
     return (
@@ -59,13 +97,26 @@ const SellTicket = ({ onClose, onSuccess }) => {
 
                 <form onSubmit={handleSubmit} className="modal-form">
                     <div className="form-group">
-                        <label className="form-label">User ID *</label>
+                        <label className="form-label">Seller User ID *</label>
                         <input
                             type="text"
                             name="user_id"
                             value={formData.user_id}
                             onChange={handleChange}
-                            placeholder="Enter user ID"
+                            placeholder="Enter seller user ID"
+                            className="form-input"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Buyer User ID *</label>
+                        <input
+                            type="text"
+                            name="buyer_id"
+                            value={formData.buyer_id}
+                            onChange={handleChange}
+                            placeholder="Enter buyer user ID"
                             className="form-input"
                             required
                         />
@@ -91,12 +142,13 @@ const SellTicket = ({ onClose, onSuccess }) => {
                             name="sale_price"
                             value={formData.sale_price}
                             onChange={handleChange}
-                            placeholder="0.00"
-                            step="0.01"
+                            placeholder="355"
+                            step="1"
                             min="0"
                             className="form-input"
                             required
                         />
+                        <small className="form-help">Enter as whole number (e.g., 355)</small>
                     </div>
 
                     <div className="modal-actions">

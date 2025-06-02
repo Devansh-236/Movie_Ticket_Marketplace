@@ -32,14 +32,41 @@ const PurchaseTicket = ({ onClose, onSuccess }) => {
             await transactionAPI.purchaseTicket({
                 user_id: formData.user_id,
                 theatre_seat: formData.theatre_seat,
-                purchase_price: parseFloat(formData.purchase_price),
+                purchase_price: parseInt(formData.purchase_price, 10),
                 payment_method: formData.payment_method
             });
 
             toast.success('Ticket purchased successfully');
             onSuccess();
         } catch (error) {
-            toast.error(error.response?.data?.detail || 'Failed to purchase ticket');
+            console.error('Purchase ticket error:', error);
+
+            // Properly extract error message - NEVER render objects
+            let errorMessage = 'Failed to purchase ticket';
+
+            if (error.response?.data?.detail) {
+                if (Array.isArray(error.response.data.detail)) {
+                    // Extract messages from validation error objects
+                    const messages = error.response.data.detail
+                        .map(err => {
+                            if (typeof err === 'string') return err;
+                            if (err.msg) return err.msg;
+                            if (err.message) return err.message;
+                            return 'Validation error';
+                        })
+                        .filter(msg => msg && msg.trim() !== ''); // Remove empty messages
+
+                    errorMessage = messages.length > 0 ? messages.join(', ') : 'Validation failed';
+                } else if (typeof error.response.data.detail === 'string') {
+                    errorMessage = error.response.data.detail;
+                }
+            } else if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
@@ -47,10 +74,19 @@ const PurchaseTicket = ({ onClose, onSuccess }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+
+        if (name === 'purchase_price') {
+            const integerValue = value.replace(/[^\d]/g, '');
+            setFormData(prev => ({
+                ...prev,
+                [name]: integerValue
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
     return (
@@ -100,12 +136,13 @@ const PurchaseTicket = ({ onClose, onSuccess }) => {
                             name="purchase_price"
                             value={formData.purchase_price}
                             onChange={handleChange}
-                            placeholder="0.00"
-                            step="0.01"
+                            placeholder="355"
+                            step="1"
                             min="0"
                             className="form-input"
                             required
                         />
+                        <small className="form-help">Enter as whole number (e.g., 355)</small>
                     </div>
 
                     <div className="form-group">
