@@ -1,0 +1,15 @@
+/* App.css - Basic app-level styles */
+.app {
+    min-height: 100vh;
+    transition: all 0.3s ease;
+}
+
+.app.dark {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.app.light {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}

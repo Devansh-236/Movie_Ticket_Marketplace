@@ -1,0 +1,154 @@
+service: movie-booking-serverless-api
+
+frameworkVersion: '^3.0.0'
+
+provider:
+  name: aws
+  runtime: python3.11
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  timeout: 30
+  environment:
+    DYNAMODB_TABLE: ticket-booking
+    USERS_TABLE: users-payroll
+    TRANSACTIONS_TABLE: user-transactions
+    PRICE_CHANGE_TOPIC_ARN: !Ref PriceChangeTopic
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: 
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/ticket-booking"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/users-payroll"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/user-transactions"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/user-transactions/index/*"
+        - Effect: Allow
+          Action:
+            - sns:Publish
+          Resource: !Ref PriceChangeTopic
+        - Effect: Allow
+          Action:
+            - sqs:ReceiveMessage
+            - sqs:DeleteMessage
+            - sqs:GetQueueAttributes
+          Resource: !GetAtt PriceChangeQueue.Arn
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+
+functions:
+  api:
+    handler: app.handler
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+      - httpApi:
+          path: /
+          method: ANY
+
+  priceChangeEventHandler:
+    handler: handlers.event_handler.handle_price_change_event
+    events:
+      - sqs:
+          arn: !GetAtt PriceChangeQueue.Arn
+          batchSize: 1
+
+resources:
+  Resources:
+    # Existing resources
+    PriceChangeTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:service}-${self:provider.stage}-price-change-topic
+        DisplayName: Movie Ticket Price Change Topic
+
+    PriceChangeQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:service}-${self:provider.stage}-price-change-queue
+        VisibilityTimeout: 300
+        MessageRetentionPeriod: 1209600
+        ReceiveMessageWaitTimeSeconds: 20
+
+    PriceChangeQueuePolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        Queues:
+          - !Ref PriceChangeQueue
+        PolicyDocument:
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: sns.amazonaws.com
+              Action: sqs:SendMessage
+              Resource: !GetAtt PriceChangeQueue.Arn
+              Condition:
+                ArnEquals:
+                  aws:SourceArn: !Ref PriceChangeTopic
+
+    PriceChangeSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: sqs
+        TopicArn: !Ref PriceChangeTopic
+        Endpoint: !GetAtt PriceChangeQueue.Arn
+
+    # NEW: Users payroll table
+    UsersPayrollTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: users-payroll
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+
+    # NEW: User transactions table
+    UserTransactionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: user-transactions
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: transactionId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: S
+        KeySchema:
+          - AttributeName: transactionId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserTransactionsIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: timestamp
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!.git/**'
+    - '!.serverless/**'
+    - '!.env'
+    - '!package.json'
+    - '!package-lock.json'

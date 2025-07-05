@@ -1,0 +1,37 @@
+{
+  "name": "movie-booking-serverless-api",
+  "version": "1.0.0",
+  "description": "Movie Ticket Booking CRUD API using Serverless Framework with LocalStack",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "deploy-local": "serverless deploy --stage local",
+    "remove": "serverless remove",
+    "remove-local": "serverless remove --stage local",
+    "logs": "serverless logs -f",
+    "invoke": "serverless invoke -f",
+    "offline": "serverless offline",
+    "localstack-start": "docker-compose up -d",
+    "localstack-stop": "docker-compose down",
+    "localstack-setup": "./localstack-setup.sh",
+    "setup": "./setup.sh"
+  },
+  "keywords": [
+    "serverless",
+    "aws",
+    "lambda",
+    "dynamodb",
+    "api-gateway",
+    "crud",
+    "movie-booking",
+    "localstack"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-python-requirements": "^6.0.0",
+    "serverless-localstack": "^1.1.2",
+    "serverless-offline": "^13.3.0"
+  }
+}
