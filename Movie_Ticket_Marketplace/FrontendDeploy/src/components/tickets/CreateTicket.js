@@ -128,15 +128,6 @@ const CreateTicket = () => {
             </div>
 
             <div className="form-container">
-                {/* Debug section - remove after fixing */}
-                <div style={{ marginBottom: '1rem', padding: '1rem', background: '#f0f0f0', borderRadius: '4px' }}>
-                    <p><strong>Debug Info:</strong></p>
-                    <p>API URL: {process.env.REACT_APP_API_URL}</p>
-                    <button type="button" onClick={testAPI} className="btn btn-secondary" style={{ marginBottom: '0.5rem' }}>
-                        Test API Connection
-                    </button>
-                    <p>Form Data: {JSON.stringify(formData)}</p>
-                </div>
 
                 <form onSubmit={handleSubmit} className="form">
                     <div className="form-group">
